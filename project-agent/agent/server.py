@@ -32,6 +32,7 @@ class ChatRequest(BaseModel):
     message: str
     session_id: str = "default-session"
     project_id: str = None
+    stream_output: bool = False
 
 @app.get("/api/projects")
 async def get_projects():
@@ -285,8 +286,12 @@ async def chat(request: ChatRequest):
                     break
                 if line:
                     full_output += line
-                    # Send text chunk to keep connection alive and update UI
-                    yield line
+                    if request.stream_output:
+                        # Send text chunk to keep connection alive and update UI
+                        yield line
+                    else:
+                        # Send spaces to keep Render connection alive for standard res.json() clients
+                        yield " " * 1024
                     await asyncio.sleep(0.01) # Small yield to event loop
                     
             # Process finished. Extract final JSON.
@@ -296,12 +301,21 @@ async def chat(request: ChatRequest):
             elif "Agent:" in final_response:
                 final_response = final_response.split("Agent:")[-1].strip()
                 
-            # Yield a special delimiter so the frontend knows what is the final JSON
-            yield "\n__FINAL_JSON__\n"
-            if "{" not in final_response:
-                yield f'{{"error": "Agent returned no valid JSON. Raw: {final_response}"}}'
+            if request.stream_output:
+                # Yield a special delimiter so the frontend knows what is the final JSON
+                yield "\n__FINAL_JSON__\n"
+                if "{" not in final_response:
+                    yield f'{{"error": "Agent returned no valid JSON. Raw: {final_response}"}}'
+                else:
+                    yield final_response
             else:
-                yield final_response
+                # For non-streaming requests, just yield valid JSON so res.json() works
+                if "{" not in final_response:
+                    import json
+                    yield json.dumps({"error": f"Agent returned no valid JSON. Raw: {final_response}"})
+                else:
+                    import json
+                    yield json.dumps({"response": final_response})
 
         return StreamingResponse(stream_agent_output(), media_type="text/plain")
         

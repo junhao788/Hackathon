@@ -965,7 +965,7 @@ export default function Dashboard() {
       const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: `Execute ZERO TO ONE protocol for: ${zeroIdea}`, project_id: selectedProjectId }),
+        body: JSON.stringify({ message: `Execute ZERO TO ONE protocol for: ${zeroIdea}`, project_id: selectedProjectId, stream_output: true }),
         signal: controller.signal
       });
       clearTimeout(timeoutId);
