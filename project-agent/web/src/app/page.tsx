@@ -1037,13 +1037,13 @@ export default function Dashboard() {
             // ---------------------------------------------------------
             
           } else {
-            setZeroRawText(text);
+            setZeroRawText(jsonText);
           }
         } else {
-          setZeroRawText(text);
+          setZeroRawText(jsonText);
         }
       } catch {
-        setZeroRawText(text);
+        setZeroRawText(jsonText);
       }
       setZeroIdea('');
     } catch (e) {
