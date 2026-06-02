@@ -229,100 +229,122 @@ async def update_team_member(username: str, member: TeamMemberRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+def _run_agent_sync(adk_exe, agent_dir, final_query, merged_env, base_dir):
+    """Run the ADK agent synchronously (for use in a thread). Returns dict."""
+    import subprocess as sp
+    try:
+        result = sp.run(
+            [adk_exe, "run", agent_dir, final_query],
+            env=merged_env,
+            cwd=base_dir,
+            capture_output=True,
+            text=True,
+            timeout=180  # 3 minutes max
+        )
+        output = result.stdout + result.stderr
+    except sp.TimeoutExpired:
+        return {"response": '{"error": "Agent timed out after 180 seconds."}'}
+    except Exception as e:
+        return {"response": f'{{"error": "Agent execution failed: {str(e)}"}}'}
+
+    # Extract the final agent response
+    final_response = output.strip()
+    if "[project_agent]:" in final_response:
+        final_response = final_response.split("[project_agent]:")[-1].strip()
+    elif "Agent:" in final_response:
+        final_response = final_response.split("Agent:")[-1].strip()
+
+    if "{" not in final_response:
+        return {"response": f'{{"error": "Agent returned no valid JSON."}}'}
+
+    return {"response": final_response}
+
+
+def _prepare_agent_env():
+    """Prepare common environment variables and paths for the agent."""
+    import os
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    adk_exe = os.path.join(base_dir, ".venv", "Scripts", "adk.exe")  # Windows
+    if not os.path.exists(adk_exe):
+        adk_exe = os.path.join(base_dir, ".venv", "bin", "adk")  # Linux/Render
+    if not os.path.exists(adk_exe):
+        adk_exe = "adk"  # Fallback to PATH
+    agent_dir = os.path.join(base_dir, "agent")
+    env_file_path = os.path.join(base_dir, ".env")
+
+    merged_env = os.environ.copy()
+    merged_env["PYTHONIOENCODING"] = "utf-8"
+    if os.path.exists(env_file_path):
+        with open(env_file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    merged_env[k] = v.strip("'\"")
+
+    return base_dir, adk_exe, agent_dir, merged_env
+
+
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
         print(f"Executing Agent with query: {request.message}")
-        
-        import os
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        adk_exe = os.path.join(base_dir, ".venv", "Scripts", "adk.exe")
-        if not os.path.exists(adk_exe):
-            adk_exe = "adk"
-        agent_dir = os.path.join(base_dir, "agent")
-        env_file_path = os.path.join(base_dir, ".env")
-        
-        # Load env vars properly
-        merged_env = os.environ.copy()
-        merged_env["PYTHONIOENCODING"] = "utf-8"
-        if os.path.exists(env_file_path):
-            with open(env_file_path, "r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith("#") and "=" in line:
-                        k, v = line.split("=", 1)
-                        merged_env[k] = v.strip("'\"")
-                        
+
+        base_dir, adk_exe, agent_dir, merged_env = _prepare_agent_env()
+
         final_query = request.message
         if request.project_id:
             final_query = f"[TARGET PROJECT ID: {request.project_id}]\n\n{final_query}"
-            
-        import subprocess as sp
-        import tempfile
-        
-        temp_fd, temp_out_path = tempfile.mkstemp(text=True)
-        os.close(temp_fd) 
-        
-        from fastapi.responses import StreamingResponse
-        import asyncio
-        
-        async def stream_agent_output():
-            # Use Popen to capture output in real-time
-            process = sp.Popen(
-                [adk_exe, "run", agent_dir, final_query],
-                env=merged_env,
-                cwd=base_dir,
-                stdout=sp.PIPE,
-                stderr=sp.STDOUT,
-                text=True,
-                bufsize=1 # Line buffered
-            )
-            
-            full_output = ""
-            # Yield output line by line as SSE
-            while True:
-                line = process.stdout.readline()
-                if not line and process.poll() is not None:
-                    break
-                if line:
-                    full_output += line
-                    if request.stream_output:
-                        # Send text chunk to keep connection alive and update UI
+
+        # ── STREAMING MODE (Zero-to-One only) ──────────────────────────
+        if request.stream_output:
+            import subprocess as sp
+            from fastapi.responses import StreamingResponse
+
+            async def stream_agent_output():
+                process = sp.Popen(
+                    [adk_exe, "run", agent_dir, final_query],
+                    env=merged_env,
+                    cwd=base_dir,
+                    stdout=sp.PIPE,
+                    stderr=sp.STDOUT,
+                    text=True,
+                    bufsize=1
+                )
+
+                full_output = ""
+                while True:
+                    line = await asyncio.to_thread(process.stdout.readline)
+                    if not line and process.poll() is not None:
+                        break
+                    if line:
+                        full_output += line
                         yield line
-                    else:
-                        # Send spaces to keep Render connection alive for standard res.json() clients
-                        yield " " * 1024
-                    await asyncio.sleep(0.01) # Small yield to event loop
-                    
-            # Process finished. Extract final JSON.
-            final_response = full_output.strip()
-            if "[project_agent]:" in final_response:
-                final_response = final_response.split("[project_agent]:")[-1].strip()
-            elif "Agent:" in final_response:
-                final_response = final_response.split("Agent:")[-1].strip()
-                
-            if request.stream_output:
-                # Yield a special delimiter so the frontend knows what is the final JSON
+
+                # Extract final JSON
+                final_response = full_output.strip()
+                if "[project_agent]:" in final_response:
+                    final_response = final_response.split("[project_agent]:")[-1].strip()
+                elif "Agent:" in final_response:
+                    final_response = final_response.split("Agent:")[-1].strip()
+
                 yield "\n__FINAL_JSON__\n"
                 if "{" not in final_response:
-                    yield f'{{"error": "Agent returned no valid JSON. Raw: {final_response}"}}'
+                    yield f'{{"error": "Agent returned no valid JSON. Raw output length: {len(full_output)}"}}'
                 else:
                     yield final_response
-            else:
-                # For non-streaming requests, just yield valid JSON so res.json() works
-                if "{" not in final_response:
-                    import json
-                    yield json.dumps({"error": f"Agent returned no valid JSON. Raw: {final_response}"})
-                else:
-                    import json
-                    yield json.dumps({"response": final_response})
 
-        return StreamingResponse(stream_agent_output(), media_type="text/plain")
-        
+            return StreamingResponse(stream_agent_output(), media_type="text/plain")
+
+        # ── NORMAL MODE (all other features) ───────────────────────────
+        result = await asyncio.to_thread(
+            _run_agent_sync, adk_exe, agent_dir, final_query, merged_env, base_dir
+        )
+        return result
+
     except Exception as e:
         import traceback
         print(f"Error during agent execution: {traceback.format_exc()}")
-        from fastapi import HTTPException
         if isinstance(e, HTTPException):
             raise e
         raise HTTPException(status_code=500, detail=str(e))
