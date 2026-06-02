@@ -590,7 +590,6 @@ def create_repository(name: str, description: str = "") -> dict:
     import requests
     
     url = f"{GITLAB_API_URL}/projects"
-    headers = {"PRIVATE-TOKEN": GITLAB_PERSONAL_ACCESS_TOKEN}
     payload = {
         "name": name,
         "description": description,
@@ -598,7 +597,7 @@ def create_repository(name: str, description: str = "") -> dict:
         "visibility": "public"
     }
     
-    resp = requests.post(url, headers=headers, json=payload)
+    resp = requests.post(url, headers=HEADERS, json=payload)
     if resp.status_code not in (200, 201):
         return {"error": f"Failed to create project: {resp.text}"}
         
