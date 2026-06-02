@@ -1,0 +1,44 @@
+{
+  "team": [
+    {
+      "name": "Werd How",
+      "username": "howwerd0898",
+      "aliases": ["JunHaoGitHub"],
+      "role": "Owner / Tech Lead",
+      "skills": ["Management", "Architecture", "Review"],
+      "experience_level": "Lead",
+      "current_open_issues": 0,
+      "availability": "Low",
+      "timezone": "UTC+8",
+      "assignable": false
+    },
+    {
+      "name": "Jun Hao INTI",
+      "username": "JunnnHaoooo",
+      "role": "Developer",
+      "skills": [
+        "React",
+        "TailwindCSS",
+        "Javascript"
+      ],
+      "experience_level": "Senior",
+      "current_open_issues": 0,
+      "availability": "Medium",
+      "timezone": "UTC+8"
+    },
+    {
+      "name": "Crystal",
+      "username": "crystalchong000813",
+      "role": "Backend Developer",
+      "skills": [
+        "Python",
+        "Docker",
+        "API"
+      ],
+      "experience_level": "Junior",
+      "current_open_issues": 0,
+      "availability": "Medium",
+      "timezone": "UTC+8"
+    }
+  ]
+}
