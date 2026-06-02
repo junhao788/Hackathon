@@ -970,16 +970,29 @@ export default function Dashboard() {
       });
       clearTimeout(timeoutId);
       
-      const data = await res.json();
-      const text = data.response || "";
+      if (!res.body) throw new Error("No response body");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let fullText = "";
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        fullText += chunk;
+        setZeroRawText(fullText.split('__FINAL_JSON__')[0]);
+      }
+      
+      const parts = fullText.split('__FINAL_JSON__');
+      const jsonText = parts.length > 1 ? parts[1] : parts[0];
       
       // Try to extract zero_to_one JSON
       try {
-        const firstBrace = text.indexOf('{');
-        const lastBrace = text.lastIndexOf('}');
+        const firstBrace = jsonText.indexOf('{');
+        const lastBrace = jsonText.lastIndexOf('}');
         if (firstBrace !== -1 && lastBrace !== -1) {
-          const parsed = JSON.parse(text.substring(firstBrace, lastBrace + 1));
-                    if (parsed.zero_to_one) {
+          const parsed = JSON.parse(jsonText.substring(firstBrace, lastBrace + 1));
+          if (parsed.zero_to_one) {
             setZeroResult(parsed.zero_to_one);
             
             const newProjectId = parsed.zero_to_one.project_id || selectedProjectId;

@@ -262,23 +262,49 @@ async def chat(request: ChatRequest):
         temp_fd, temp_out_path = tempfile.mkstemp(text=True)
         os.close(temp_fd) 
         
-        try:
-            # We must use Popen to run this in the background, otherwise Render's 100s timeout will kill the connection, 
-            # and if we use sp.run with timeout=90, it will SIGKILL the agent before it finishes!
-            out_f = open(temp_out_path, 'w', encoding='utf-8')
+        from fastapi.responses import StreamingResponse
+        import asyncio
+        
+        async def stream_agent_output():
+            # Use Popen to capture output in real-time
             process = sp.Popen(
                 [adk_exe, "run", agent_dir, final_query],
                 env=merged_env,
                 cwd=base_dir,
-                stdout=out_f,
-                stderr=sp.STDOUT
+                stdout=sp.PIPE,
+                stderr=sp.STDOUT,
+                text=True,
+                bufsize=1 # Line buffered
             )
-            # Do NOT wait for it to finish. Return immediately.
-            return {"response": "Agent execution has successfully started in the background! Please check your GitLab account in 2-3 minutes to see the newly generated repository and merge requests."}
-        except Exception as e:
-            print(f"Error executing agent: {str(e)}")
-            raise HTTPException(status_code=500, detail=str(e))         
             
+            full_output = ""
+            # Yield output line by line as SSE
+            while True:
+                line = process.stdout.readline()
+                if not line and process.poll() is not None:
+                    break
+                if line:
+                    full_output += line
+                    # Send text chunk to keep connection alive and update UI
+                    yield line
+                    await asyncio.sleep(0.01) # Small yield to event loop
+                    
+            # Process finished. Extract final JSON.
+            final_response = full_output.strip()
+            if "[project_agent]:" in final_response:
+                final_response = final_response.split("[project_agent]:")[-1].strip()
+            elif "Agent:" in final_response:
+                final_response = final_response.split("Agent:")[-1].strip()
+                
+            # Yield a special delimiter so the frontend knows what is the final JSON
+            yield "\n__FINAL_JSON__\n"
+            if "{" not in final_response:
+                yield f'{{"error": "Agent returned no valid JSON. Raw: {final_response}"}}'
+            else:
+                yield final_response
+
+        return StreamingResponse(stream_agent_output(), media_type="text/plain")
+        
     except Exception as e:
         import traceback
         print(f"Error during agent execution: {traceback.format_exc()}")
