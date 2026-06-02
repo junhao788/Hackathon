@@ -1241,7 +1241,7 @@ export default function Dashboard() {
           )}
 
           {/* EMPTY STATE FOR PROJECT-DEPENDENT TABS */}
-          {!loadingProjects && projects.length === 0 && ['dashboard', 'standup', 'issues', 'sprint', 'architect', 'techlead', 'releases'].includes(activeTab) && (
+          {!loadingProjects && projects.length === 0 && ['dashboard', 'standup', 'issues', 'sprint', 'architect', 'techlead', 'releases', 'team'].includes(activeTab) && (
             <div className="flex flex-col items-center justify-center h-[70vh] animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="bg-[#18181b] border border-border/50 rounded-3xl p-10 max-w-lg text-center shadow-xl relative overflow-hidden">
                 
@@ -1894,7 +1894,7 @@ export default function Dashboard() {
           )}
 
           {/* TAB: TEAM WORKLOAD */}
-          {activeTab === 'team' && (
+          {activeTab === 'team' && projects.length > 0 && (
             <div className="dashboard-card min-h-[500px] flex flex-col">
                <div className="mb-6 flex items-center justify-between">
                  <div>
