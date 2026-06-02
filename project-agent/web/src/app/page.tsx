@@ -402,7 +402,7 @@ export default function Dashboard() {
   
   const fetchProjects = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/projects');
+      const res = await fetch('https://hackathon-030e.onrender.com/api/projects');
       const data = await res.json();
       if (data.projects && data.projects.length > 0) {
         setProjects(data.projects);
@@ -418,7 +418,7 @@ export default function Dashboard() {
   const fetchDashboardMetrics = async (projectId: string) => {
     setIsLoadingMetrics(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/dashboard/${projectId}`);
+      const res = await fetch(`https://hackathon-030e.onrender.com/api/dashboard/${projectId}`);
       const data = await res.json();
       setDashboardMetrics(data);
     } catch (err) {
@@ -474,7 +474,7 @@ export default function Dashboard() {
     if (!selectedProjectId) return;
     setLoadingReviews(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/reviews/${selectedProjectId}`);
+      const res = await fetch(`https://hackathon-030e.onrender.com/api/reviews/${selectedProjectId}`);
       const data = await res.json();
       setTechReviews(data.reviews || []);
     } catch (err) {
@@ -530,7 +530,7 @@ export default function Dashboard() {
     if (!selectedProjectId) return;
     setLoadingTeam(true);
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: 'Execute TEAM WORKLOAD DASHBOARD protocol. Fetch team profiles and their assigned issues.', project_id: selectedProjectId })
@@ -563,7 +563,7 @@ export default function Dashboard() {
     if (!selectedProjectId) return;
     setLoadingSprintHistory(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/sprints/${selectedProjectId}`);
+      const res = await fetch(`https://hackathon-030e.onrender.com/api/sprints/${selectedProjectId}`);
       const data = await res.json();
       setSprintHistory(data.sprints || []);
     } catch (err) {
@@ -599,7 +599,7 @@ export default function Dashboard() {
       if (jsonMatch) {
         pureJson = jsonMatch[0];
       }
-      await fetch(`http://localhost:8000/api/sprints/${selectedProjectId}`, {
+      await fetch(`https://hackathon-030e.onrender.com/api/sprints/${selectedProjectId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sprint_data: pureJson })
@@ -649,7 +649,7 @@ export default function Dashboard() {
     }
     
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: promptMsg, project_id: selectedProjectId })
@@ -662,7 +662,7 @@ export default function Dashboard() {
       const jsonMatch = sprintPlanResult.match(/\{[\s\S]*\}/);
       if (jsonMatch) pureJson = jsonMatch[0];
       
-      await fetch(`http://localhost:8000/api/sprints/${selectedProjectId}`, {
+      await fetch(`https://hackathon-030e.onrender.com/api/sprints/${selectedProjectId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sprint_data: pureJson })
@@ -681,7 +681,7 @@ export default function Dashboard() {
     if (!selectedProjectId) return;
     setSyncingSprintId(sprint.sprint_id);
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -692,7 +692,7 @@ export default function Dashboard() {
       const data = await res.json();
       
       // Save the updated JSON back to history
-      await fetch(`http://localhost:8000/api/sprints/${selectedProjectId}`, {
+      await fetch(`https://hackathon-030e.onrender.com/api/sprints/${selectedProjectId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sprint_data: data.response })
@@ -707,7 +707,7 @@ export default function Dashboard() {
   const fetchRoster = async () => {
     setLoadingRoster(true);
     try {
-      const res = await fetch('http://localhost:8000/api/team');
+      const res = await fetch('https://hackathon-030e.onrender.com/api/team');
       const data = await res.json();
       setRosterMembers(data.team || []);
     } catch (err) {
@@ -738,7 +738,7 @@ export default function Dashboard() {
     
     setIsDetectingSkills(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/github/${targetUsername}/skills`);
+      const res = await fetch(`https://hackathon-030e.onrender.com/api/github/${targetUsername}/skills`);
       if (res.ok) {
         const data = await res.json();
         if (data.skills && data.skills.length > 0) {
@@ -761,8 +761,8 @@ export default function Dashboard() {
     try {
       const method = editingUsername ? 'PUT' : 'POST';
       const url = editingUsername 
-        ? `http://localhost:8000/api/team/${editingUsername}` 
-        : 'http://localhost:8000/api/team';
+        ? `https://hackathon-030e.onrender.com/api/team/${editingUsername}` 
+        : 'https://hackathon-030e.onrender.com/api/team';
         
       const res = await fetch(url, {
         method,
@@ -790,7 +790,7 @@ export default function Dashboard() {
   const handleDeleteMember = async (username: string) => {
     setDeletingUsername(username);
     try {
-      await fetch(`http://localhost:8000/api/team/${username}`, { method: 'DELETE' });
+      await fetch(`https://hackathon-030e.onrender.com/api/team/${username}`, { method: 'DELETE' });
       fetchRoster();
     } catch (e) {
       console.error('Failed to delete member', e);
@@ -822,7 +822,7 @@ export default function Dashboard() {
     setInput('');
     setMessages(prev => [...prev, { role: 'agent', content: 'Processing directive...' }]);
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMsg, project_id: selectedProjectId })
@@ -846,7 +846,7 @@ export default function Dashboard() {
     setLoadingStandup(true);
     setStandupReport('Executing STANDUP GENERATOR protocol...');
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: 'Execute STANDUP GENERATOR protocol. Generate a strict Activity Report. IMPORTANT: 1. Convert all GitLab UTC timestamps to UTC+8 (Malaysia Time) before filtering for today. 2. You MUST include every single team member in the JSON array, even if they have absolutely NO activity today. 3. Werd How (howwerd0898) and Jun Hao INTI (JunnnHaoooo) are COMPLETELY SEPARATE accounts, do NOT merge them! 4. Merge JunHaoGitHub into Werd How. 5. STRICTLY use the `closed_by` field to determine who closed an issue, not the assignees.', project_id: selectedProjectId })
@@ -864,7 +864,7 @@ export default function Dashboard() {
     setLoadingIssue(true);
     setIssueResult('Executing ISSUE INTEL protocol...');
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: `Execute ISSUE INTEL protocol for: ${issueQuery}`, project_id: selectedProjectId })
@@ -913,7 +913,7 @@ export default function Dashboard() {
     }
 
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: promptMsg, project_id: selectedProjectId })
@@ -931,7 +931,7 @@ export default function Dashboard() {
     setLoadingArchitect(true);
     setArchitectResult('Executing FEATURE ARCHITECT protocol...\nAutonomously analyzing request and writing to GitLab repository...');
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: `Execute FEATURE ARCHITECT protocol for: ${architectIdea}`, project_id: selectedProjectId })
@@ -962,7 +962,7 @@ export default function Dashboard() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 125000); // 125s max wait
       
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: `Execute ZERO TO ONE protocol for: ${zeroIdea}`, project_id: selectedProjectId }),
@@ -994,7 +994,7 @@ export default function Dashboard() {
               const sprintController = new AbortController();
               const sprintTimeout = setTimeout(() => sprintController.abort(), 125000);
               
-              const sprintRes = await fetch('http://localhost:8000/api/chat', {
+              const sprintRes = await fetch('https://hackathon-030e.onrender.com/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: 'Execute SPRINT PROTOCOL.', project_id: newProjectId }),
@@ -1010,7 +1010,7 @@ export default function Dashboard() {
               const jsonMatch = sprintPlanResult.match(/\{[\s\S]*\}/);
               if (jsonMatch) pureJson = jsonMatch[0];
               
-              await fetch(`http://localhost:8000/api/sprints/${newProjectId}`, {
+              await fetch(`https://hackathon-030e.onrender.com/api/sprints/${newProjectId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sprint_data: pureJson })
@@ -2081,7 +2081,7 @@ export default function Dashboard() {
                         setLoadingRelease(true);
                         setReleaseReport(null);
                         try {
-                          const res = await fetch(`http://localhost:8000/api/releases/${selectedProjectId}/generate`, {
+                          const res = await fetch(`https://hackathon-030e.onrender.com/api/releases/${selectedProjectId}/generate`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ version: releaseVersion })
@@ -2225,7 +2225,7 @@ export default function Dashboard() {
                           onClick={async () => {
                             setPublishingRelease(true);
                             try {
-                              const res = await fetch(`http://localhost:8000/api/releases/${selectedProjectId}/publish`, {
+                              const res = await fetch(`https://hackathon-030e.onrender.com/api/releases/${selectedProjectId}/publish`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
