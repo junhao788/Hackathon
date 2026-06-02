@@ -582,6 +582,28 @@ def post_mr_comment(project_id: str, mr_iid: int, body: str) -> dict:
     if resp.status_code == 201:
         return resp.json()
     return {}
+def create_repository(name: str, description: str = "") -> dict:
+    """
+    Creates a new GitLab project (repository) with the given name.
+    """
+    import os
+    import requests
+    
+    url = f"{GITLAB_API_URL}/projects"
+    headers = {"PRIVATE-TOKEN": GITLAB_PERSONAL_ACCESS_TOKEN}
+    payload = {
+        "name": name,
+        "description": description,
+        "initialize_with_readme": True,
+        "visibility": "public"
+    }
+    
+    resp = requests.post(url, headers=headers, json=payload)
+    if resp.status_code not in (200, 201):
+        return {"error": f"Failed to create project: {resp.text}"}
+        
+    return resp.json()
+
 def scaffold_project(project_id: str, clone_url: str, framework: str) -> dict:
     """
     Scaffolds a new project using the specified framework and pushes it to GitLab.
