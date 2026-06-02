@@ -236,6 +236,8 @@ async def chat(request: ChatRequest):
         import os
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         adk_exe = os.path.join(base_dir, ".venv", "Scripts", "adk.exe")
+        if not os.path.exists(adk_exe):
+            adk_exe = "adk"
         agent_dir = os.path.join(base_dir, "agent")
         env_file_path = os.path.join(base_dir, ".env")
         
@@ -261,42 +263,21 @@ async def chat(request: ChatRequest):
         os.close(temp_fd) 
         
         try:
-            with open(temp_out_path, 'w', encoding='utf-8') as out_f:
-                sp.run(
-                    [adk_exe, "run", agent_dir, final_query],
-                    env=merged_env,
-                    cwd=base_dir,
-                    stdout=out_f,
-                    stderr=sp.STDOUT,
-                    timeout=110
-                )
-        except sp.TimeoutExpired:
-            print("Agent execution timed out after 110 seconds! Recovering output from temp file...")
+            # We must use Popen to run this in the background, otherwise Render's 100s timeout will kill the connection, 
+            # and if we use sp.run with timeout=90, it will SIGKILL the agent before it finishes!
+            out_f = open(temp_out_path, 'w', encoding='utf-8')
+            process = sp.Popen(
+                [adk_exe, "run", agent_dir, final_query],
+                env=merged_env,
+                cwd=base_dir,
+                stdout=out_f,
+                stderr=sp.STDOUT
+            )
+            # Do NOT wait for it to finish. Return immediately.
+            return {"response": "Agent execution has successfully started in the background! Please check your GitLab account in 2-3 minutes to see the newly generated repository and merge requests."}
         except Exception as e:
-            print(f"Subprocess run failed: {e}")
-            
-        with open(temp_out_path, 'r', encoding='utf-8', errors='ignore') as in_f:
-            output = in_f.read()
-            
-        try:
-            os.remove(temp_out_path)
-        except Exception:
-            pass
-            
-        final_response = output.strip()
-        
-        if "[project_agent]:" in final_response:
-            final_response = final_response.split("[project_agent]:")[-1].strip()
-        elif "Agent:" in final_response:
-            final_response = final_response.split("Agent:")[-1].strip()
-            
-        if "{" not in final_response:
-            print(f"AGENT OUTPUT:\n{output}")
-            from fastapi import HTTPException
-            raise HTTPException(status_code=504, detail="Agent returned no valid JSON. Check server logs.")
-            
-        print("Agent execution completed successfully.")
-        return {"response": final_response}
+            print(f"Error executing agent: {str(e)}")
+            raise HTTPException(status_code=500, detail=str(e))         
             
     except Exception as e:
         import traceback
