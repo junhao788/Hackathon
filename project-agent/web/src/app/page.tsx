@@ -960,7 +960,7 @@ export default function Dashboard() {
     
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 125000); // 125s max wait
+      const timeoutId = setTimeout(() => controller.abort(), 300000); // 300s max wait
       
       const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
         method: 'POST',
@@ -1005,7 +1005,7 @@ export default function Dashboard() {
             setZeroProgress(p => [...p, '🚀 🏃‍♂️ Executing Sprint Planner...']);
             try {
               const sprintController = new AbortController();
-              const sprintTimeout = setTimeout(() => sprintController.abort(), 125000);
+              const sprintTimeout = setTimeout(() => sprintController.abort(), 300000);
               
               const sprintRes = await fetch('https://hackathon-030e.onrender.com/api/chat', {
                 method: 'POST',
