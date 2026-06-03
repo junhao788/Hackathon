@@ -298,28 +298,26 @@ async def chat(request: ChatRequest):
 
         # ── STREAMING MODE (Zero-to-One only) ──────────────────────────
         if request.stream_output:
-            import subprocess as sp
             from fastapi.responses import StreamingResponse
 
             async def stream_agent_output():
-                process = sp.Popen(
-                    [adk_exe, "run", agent_dir, final_query],
+                process = await asyncio.create_subprocess_exec(
+                    adk_exe, "run", agent_dir, final_query,
                     env=merged_env,
                     cwd=base_dir,
-                    stdout=sp.PIPE,
-                    stderr=sp.STDOUT,
-                    text=True,
-                    bufsize=1
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.STDOUT,
                 )
 
                 full_output = ""
                 while True:
-                    line = await asyncio.to_thread(process.stdout.readline)
-                    if not line and process.poll() is not None:
+                    line_bytes = await process.stdout.readline()
+                    if not line_bytes and process.returncode is not None:
                         break
-                    if line:
-                        full_output += line
-                        yield line
+                    if line_bytes:
+                        line_str = line_bytes.decode('utf-8', errors='replace')
+                        full_output += line_str
+                        yield line_str
 
                 # Extract final JSON
                 final_response = full_output.strip()
@@ -337,39 +335,35 @@ async def chat(request: ChatRequest):
             return StreamingResponse(stream_agent_output(), media_type="text/plain")
 
         # ── NORMAL MODE (all other features) ───────────────────────────
-        import subprocess as sp
         from fastapi.responses import StreamingResponse
 
         async def stream_spaces_then_json():
-            process = sp.Popen(
-                [adk_exe, "run", agent_dir, final_query],
+            process = await asyncio.create_subprocess_exec(
+                adk_exe, "run", agent_dir, final_query,
                 env=merged_env,
                 cwd=base_dir,
-                stdout=sp.PIPE,
-                stderr=sp.STDOUT,
-                text=True,
-                bufsize=1
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.STDOUT,
             )
 
             full_output = ""
             while True:
-                # Read line with timeout so we can yield spaces if idle
                 try:
-                    line = await asyncio.wait_for(asyncio.to_thread(process.stdout.readline), timeout=2.0)
+                    # Read line fully asynchronously
+                    line_bytes = await asyncio.wait_for(process.stdout.readline(), timeout=2.0)
+                    
+                    if not line_bytes and process.returncode is not None:
+                        break
+                        
+                    if line_bytes:
+                        full_output += line_bytes.decode('utf-8', errors='replace')
+                        yield " "  # Yield space on output
                 except asyncio.TimeoutError:
                     # Still working, send a space to keep Render alive
                     yield " "
-                    if process.poll() is not None:
+                    if process.returncode is not None:
                         break
                     continue
-
-                if not line and process.poll() is not None:
-                    break
-                
-                if line:
-                    full_output += line
-                    # Yield space to keep connection alive, valid for JSON parsing
-                    yield " "
 
             # Process finished. Extract final JSON.
             final_response = full_output.strip()
