@@ -921,7 +921,26 @@ export default function Dashboard() {
         body: JSON.stringify({ message: promptMsg, project_id: selectedProjectId })
       });
       const data = await res.json();
-      setSprintPlan(data.response);
+      const sprintOutput = data.response;
+      
+      // Auto-save logic
+      let pureJson = sprintOutput;
+      const jsonMatch = sprintOutput.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        pureJson = jsonMatch[0];
+      }
+      
+      if (pureJson && pureJson.includes('sprint_capacity_hours')) {
+         await fetch(`https://hackathon-030e.onrender.com/api/sprints/${selectedProjectId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sprint_data: pureJson })
+         });
+         await fetchSprintHistory();
+         setSprintPlan(null); // Clear the temporary text box since it's saved and now in history
+      } else {
+         setSprintPlan(sprintOutput); // Just show the text if it's not valid JSON
+      }
     } catch (e) {
       setSprintPlan('Error connecting to Agent.');
     }
