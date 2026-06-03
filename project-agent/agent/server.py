@@ -387,7 +387,9 @@ async def chat(request: ChatRequest):
                 import json
                 yield json.dumps({"error": f"Agent returned no valid JSON. Raw output length: {len(full_output)}"})
             else:
-                yield final_response
+                import json
+                # Wrap in {"response": ...} envelope to match what frontend expects
+                yield json.dumps({"response": final_response})
 
         return StreamingResponse(stream_spaces_then_json(), media_type="application/json")
 
