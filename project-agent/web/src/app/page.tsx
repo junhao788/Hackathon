@@ -235,7 +235,9 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
      return <div className="font-mono text-sm whitespace-pre-wrap">{text || JSON.stringify(inputBoardData)}</div>;
   }
 
-  const sprintCapacity = boardData.sprint_capacity_hours || 35;
+  const teamSize = boardData.team_size || 1;
+  const perPersonCapacity = boardData.per_person_capacity_hours || 25;
+  const sprintCapacity = boardData.sprint_capacity_hours || (teamSize * perPersonCapacity);
   const sprintUsed = boardData.sprint_used_hours || 0;
   const capacityPct = Math.min((sprintUsed / sprintCapacity) * 100, 100);
   const capacityColor = capacityPct > 90 ? 'bg-red-500' : capacityPct > 70 ? 'bg-amber-500' : 'bg-emerald-500';
@@ -250,6 +252,7 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
             <div className={`h-full ${capacityColor} rounded-full transition-all duration-500`} style={{ width: `${capacityPct}%` }} />
           </div>
           <span className="text-xs font-mono font-bold text-text-secondary shrink-0">{sprintUsed}/{sprintCapacity}h</span>
+          {teamSize > 1 && <span className="text-[10px] text-text-tertiary shrink-0">({teamSize} devs × {perPersonCapacity}h)</span>}
         </div>
       )}
       

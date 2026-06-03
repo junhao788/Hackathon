@@ -133,13 +133,16 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
 
 4. SPRINT PROTOCOL:
    - Call list_project_issues(state='opened'), list_merge_requests(state='opened')
+   - Call get_project_members(project_id) to count the number of developers on the team.
    - Draft a sprint plan prioritizing issues.
-   - SPRINT CAPACITY RULE: The combined total estimated_hours of ALL cards in P0 CRITICAL + P1 HIGH PRIORITY columns MUST NOT exceed 35 hours. If adding a card would exceed 35 hours, move it to BACKLOG instead.
+   - SPRINT CAPACITY RULE: Each developer gets 25 hours per 7-day sprint. Calculate total sprint capacity as: (number of developers) × 25 hours. The combined total estimated_hours of ALL cards in P0 CRITICAL + P1 HIGH PRIORITY columns MUST NOT exceed this total capacity. If adding a card would exceed the capacity, move it to BACKLOG instead.
    - CRITICAL: You MUST place ALL REMAINING open issues that were not selected for P0 or P1 into the "BACKLOG" column! Do NOT drop or ignore any open issues. Every single open issue must appear in the JSON output.
    - Each card MUST include an "estimated_hours" field (number: 1, 2, 3, 4, 6, or 8). Estimate based on task complexity.
    - YOU MUST RETURN A STRICT JSON OBJECT in the following format. NO markdown code blocks, NO conversational text before or after the JSON.
    {
-     "sprint_capacity_hours": 35,
+     "team_size": 3,
+     "per_person_capacity_hours": 25,
+     "sprint_capacity_hours": 75,
      "sprint_used_hours": 28,
      "board": [
        {
