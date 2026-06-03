@@ -290,6 +290,49 @@ def _prepare_agent_env():
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
+    # --- FAST PATH: Bypass AI for pure data aggregation tasks to save 300MB RAM! ---
+    if "TEAM WORKLOAD DASHBOARD" in request.message and request.project_id:
+        try:
+            from agent.gitlab_api import get_company_directory, get_project_members, list_project_issues
+            
+            # 1. Get all developers
+            company = get_company_directory().get("directory", [])
+            
+            # 2. Get project members
+            p_members = get_project_members(request.project_id).get("members", [])
+            p_usernames = {m.get("username") for m in p_members if m.get("username")}
+            
+            # 3. Get all issues
+            opened = list_project_issues(request.project_id, state="opened").get("issues", [])
+            closed = list_project_issues(request.project_id, state="closed").get("issues", [])
+            all_issues = opened + closed
+            
+            # 4. Aggregate
+            dashboard = []
+            for dev in company:
+                username = dev.get("username")
+                assigned_issues = []
+                for issue in all_issues:
+                    if username in issue.get("assignees", []):
+                        assigned_issues.append({
+                            "iid": issue.get("iid"),
+                            "title": issue.get("title"),
+                            "state": issue.get("state")
+                        })
+                
+                dashboard.append({
+                    "name": dev.get("name"),
+                    "username": username,
+                    "role": dev.get("role", "Engineer"),
+                    "skills": dev.get("skills", []),
+                    "in_project": username in p_usernames,
+                    "assigned_issues": assigned_issues
+                })
+            import json
+            return {"response": json.dumps({"team_dashboard": dashboard})}
+        except Exception as e:
+            return {"response": json.dumps({"error": f"Fast path failed: {str(e)}"})}
+
     global _agent_busy
     # Prevent concurrent AI agent calls to avoid OOM on 512MB Render
     if _agent_busy:
