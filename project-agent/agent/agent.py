@@ -226,92 +226,91 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
    STEP 2.5 - PRODUCT BLUEPRINT (Think Before You Build):
    - BEFORE creating any issues, you MUST first design a COMPLETE product blueprint in your mind.
    - This blueprint has 3 layers. You must think through ALL of them thoroughly:
+   - CRITICAL MINIMUM: Your blueprint MUST contain AT LEAST 6 pages, AT LEAST 4 database models, and AT LEAST 4 entity groups of API endpoints. Think deeply about the product — every real app has Login, Dashboard, CRUD pages for each entity, Settings, Profile, etc.
 
    BLUEPRINT LAYER 1 — PAGES & COMPONENTS (Frontend):
-   - List EVERY page/view the app needs, including:
-     * The page name and route (e.g. "/employees", "/employees/:id/edit")
-     * ALL UI components on that page (e.g. SearchBar, DataTable, FormModal, DeleteConfirmDialog)
-     * What data each page needs to display
-   - Think like a UX designer: consider List pages, Detail pages, Create/Edit forms, Dashboard pages, Settings pages, Error/404 pages.
-   - For EACH page, also think about: loading states, empty states, error states, responsive layout.
+   - List EVERY page/view the app needs. You MUST think of AT LEAST 6 pages. Consider:
+     * Authentication pages: Login, Register, Forgot Password
+     * Dashboard/Home page with summary stats and charts
+     * List pages for EACH major entity (with search, filter, sort, pagination)
+     * Detail/View pages for EACH major entity
+     * Create/Edit form pages or modals for EACH major entity
+     * Settings/Profile page
+     * 404/Error page
+   - For EACH page, list ALL UI components on it (e.g. SearchBar, DataTable, FormModal, Charts, Sidebar).
 
    BLUEPRINT LAYER 2 — API ENDPOINTS (Backend):
-   - List EVERY REST API endpoint the app needs, including:
-     * HTTP method (GET, POST, PUT, DELETE, PATCH)
-     * URL path (e.g. "/api/employees", "/api/employees/:id")
-     * Request body / query params
-     * Response shape
+   - List EVERY REST API endpoint the app needs.
    - CRITICAL: For every CRUD entity, you MUST have AT MINIMUM these 5 endpoints: List (GET), Get by ID (GET), Create (POST), Update (PUT/PATCH), Delete (DELETE).
-   - Also think about: authentication endpoints, search/filter endpoints, bulk operation endpoints, file upload endpoints, dashboard/analytics endpoints.
+   - Also MUST include: authentication endpoints (login, register, me, logout), dashboard/analytics endpoints, search/filter endpoints.
+   - Think about: file upload endpoints, bulk operation endpoints, export endpoints.
 
    BLUEPRINT LAYER 3 — DATABASE MODELS (Data):
-   - List EVERY database table/model the app needs, including:
-     * Table name and all columns (name, type, constraints)
-     * Foreign key relationships between tables
-     * Indexes needed for performance
-   - Think about: primary entities, junction/pivot tables for many-to-many relationships, audit/log tables.
+   - List EVERY database table/model. You MUST think of AT LEAST 4 models. Consider:
+     * User/Account model (for auth)
+     * Each core business entity as its own model
+     * Junction/pivot tables for many-to-many relationships
+     * Audit/log tables if the app needs history tracking
+   - For each model: table name, ALL columns (name, type, constraints), foreign keys, indexes.
 
    STEP 3 - DERIVE ISSUES FROM BLUEPRINT (Grouped & Structured):
-   - Now create issues by STRICTLY DERIVING them from your blueprint. Aim for 15-20 well-structured issues.
+   - Now create issues by STRICTLY DERIVING them from your blueprint.
+   - YOU MUST CREATE AT LEAST 15 ISSUES. If you have fewer than 15 after applying the rules below, go back to your blueprint and add more pages, features, or split complex pages into multiple issues.
    - CRITICAL FOCUS: DO NOT create ANY tasks for "Documentation", "Testing", "Unit Tests", or "QA". Strictly focus on Frontend UI/Logic, Backend APIs, and Database/Data Architecture.
    - CRITICAL: Do NOT create any "Setup", "Config", or "Initialization" tasks because the repository is ALREADY scaffolded in Step 1.5!
 
    GROUPING RULES (How to turn Blueprint into Issues):
    
-   Rule A — DATABASE (1 consolidated issue):
-     * Create exactly ONE issue titled: "Data: Define all database schemas and models"
-     * The description MUST contain a COMPLETE listing of EVERY table from Layer 3 of your blueprint.
-     * Format the description as a structured checklist, for example:
+   Rule A — DATABASE (1-2 issues):
+     * If you have 1-3 models: create 1 issue titled "Data: Define all database schemas and models"
+     * If you have 4+ models: split into 2 issues (e.g. "Data: Core entity schemas (User, Employee, Department)" and "Data: Supporting schemas (AuditLog, Settings, Notifications)")
+     * The description MUST list EVERY table with ALL columns, types, constraints, relationships, and indexes.
+     * Example description format:
        "## Database Models to Create\n
-       ### 1. Employee Table\n- id (UUID, PK)\n- name (VARCHAR 255, NOT NULL)\n- email (VARCHAR 255, UNIQUE)\n- department_id (FK -> departments.id)\n- role (VARCHAR 100)\n- phone (VARCHAR 20)\n- avatar_url (TEXT)\n- hired_at (DATE)\n- created_at (TIMESTAMP)\n- updated_at (TIMESTAMP)\n
-       ### 2. Department Table\n- id (UUID, PK)\n- name (VARCHAR 100, UNIQUE)\n- manager_id (FK -> employees.id)\n- created_at (TIMESTAMP)\n
-       ### Relationships\n- Employee belongs to Department (many-to-one)\n- Department has one Manager (Employee)\n
-       ### Indexes\n- employees.email (unique)\n- employees.department_id (for joins)"
-     * This issue should be estimated at 4-8 hours depending on the number of models.
+       ### 1. User Table\n- id (UUID, PK)\n- email (VARCHAR 255, UNIQUE, NOT NULL)\n- password_hash (VARCHAR 255, NOT NULL)\n- name (VARCHAR 255)\n- role (ENUM: admin, manager, employee)\n- created_at (TIMESTAMP)\n- updated_at (TIMESTAMP)\n
+       ### 2. Employee Table\n- id (UUID, PK)\n- user_id (FK -> users.id, UNIQUE)\n- department_id (FK -> departments.id)\n- position (VARCHAR 100)\n- salary (DECIMAL 10,2)\n- hired_at (DATE)\n
+       ### Relationships & Indexes\n- Employee belongs_to User (one-to-one)\n- Employee belongs_to Department (many-to-one)\n- INDEX on employees.department_id"
+     * Estimate: 6-16 hours depending on number of models.
    
-   Rule B — BACKEND (1 issue per entity/resource):
-     * For EACH major entity (e.g. Employee, Department, Auth), create ONE issue that covers ALL CRUD endpoints for that entity.
-     * Title format: "Backend: [Entity] API - full CRUD endpoints"
-     * Example: "Backend: Employee API - full CRUD endpoints"
-     * The description MUST list every endpoint with its method, path, request body, and response shape:
-       "## Endpoints to Implement\n
-       ### GET /api/employees\nQuery params: page, limit, search, department_id\nResponse: { employees: Employee[], total: number, page: number }\n
-       ### GET /api/employees/:id\nResponse: { employee: Employee }\nError: 404 if not found\n
-       ### POST /api/employees\nBody: { name, email, department_id, role, phone }\nValidation: email must be unique, name required\nResponse: { employee: Employee } (201)\n
-       ### PUT /api/employees/:id\nBody: { name?, email?, department_id?, role?, phone? }\nResponse: { employee: Employee }\n
-       ### DELETE /api/employees/:id\nResponse: { success: true }\nError: 404 if not found"
-     * Each entity CRUD issue should be estimated at 4-8 hours.
-     * Also create separate issues for non-CRUD backend concerns: "Backend: Authentication middleware & JWT", "Backend: File upload service", "Backend: Dashboard analytics aggregation", etc.
+   Rule B — BACKEND (2 issues per entity):
+     * For EACH major entity, create TWO issues:
+       1. "Backend: [Entity] API - Read endpoints (List & Detail)" — covers GET list with pagination/search/filter, GET by ID, and any analytics/aggregation endpoints.
+       2. "Backend: [Entity] API - Write endpoints (Create, Update, Delete)" — covers POST, PUT/PATCH, DELETE with validation and error handling.
+     * The description MUST list every endpoint with method, path, request body, response shape, validation rules, and error cases.
+     * Estimate: 4-8 hours per issue.
+     * ALSO create separate issues for non-CRUD backend concerns:
+       - "Backend: Authentication system (login, register, JWT, middleware)" — estimate 8-16 hours
+       - "Backend: Dashboard analytics & aggregation endpoints" — estimate 4-8 hours
+       - "Backend: File upload / export service" — if applicable, estimate 4-8 hours
    
-   Rule C — FRONTEND (1 issue per page):
+   Rule C — FRONTEND (1 issue per page, complex pages get 2):
      * For EACH page from Layer 1, create ONE issue.
+     * For COMPLEX pages (dashboard with charts, or pages with both list + detail views), create 2 issues.
      * Title format: "Frontend: [PageName] page"
-     * The description MUST list ALL components on that page and their behavior:
-       "## Page: Employee List (/employees)\n
-       ### Components to Build\n- SearchBar: real-time search by name/email with debounce\n- FilterDropdown: filter by department, role\n- EmployeeTable: sortable columns (name, email, department, role), clickable rows to navigate to detail\n- PaginationControls: page size selector (10/25/50), prev/next buttons\n- AddEmployeeButton: opens CreateEmployeeModal\n
-       ### States to Handle\n- Loading: skeleton table rows\n- Empty: illustration + 'No employees found' message\n- Error: retry button with error message\n
-       ### Acceptance Criteria\n- Table loads data from GET /api/employees with pagination\n- Search filters results in real-time\n- Clicking a row navigates to /employees/:id"
-     * Each page issue should be estimated at 4-8 hours depending on complexity.
+     * The description MUST list ALL components, their behavior, states to handle (loading/empty/error), and acceptance criteria.
+     * Estimate: 4-8 hours per page. Dashboard pages = 8-16 hours.
    
    Rule D — SHARED COMPONENTS (1-2 issues):
-     * Group all reusable/shared UI components into 1-2 issues.
-     * Title: "Frontend: Shared UI components (Navigation, Layout, Modals)"
-     * Description lists each shared component and where it's used.
+     * Group reusable UI components: "Frontend: Shared UI components (Navigation, Layout, Modals)"
+     * Also: "Frontend: Global state management & API client service" if applicable.
+     * Estimate: 4-8 hours each.
    
-   Rule E — INTEGRATION & MIDDLEWARE (1-3 issues):
-     * Create issues for cross-cutting concerns:
-     * Examples: "Backend: Auth middleware, JWT tokens & password hashing", "Frontend: API client service layer & auth interceptor", "Frontend: Route guards and protected pages"
+   Rule E — INTEGRATION & MIDDLEWARE (2-3 issues):
+     * "Backend: Auth middleware, JWT tokens & password hashing" — estimate 6-8 hours
+     * "Frontend: Auth flow (Login/Register pages, route guards, token management)" — estimate 6-8 hours
+     * "Frontend: API client service layer & error handling interceptor" — estimate 4-6 hours
    
    ISSUE QUALITY RULES:
-   - Every issue description MUST be detailed and structured with markdown headers and bullet points as shown in the examples above.
-   - ONLY assign tasks to the engineers invited in Step 2 based on their skills. Assign Backend/Data issues to backend developers, Frontend issues to frontend developers.
-   - SUPER CRITICAL: DO NOT INVENT OR HALLUCINATE USERNAMES. You MUST ONLY use exact usernames from `get_company_directory()`. If there are only 2 developers, distribute ALL issues between those 2.
-   - For each issue, estimate hours (1, 2, 3, 4, 6, or 8). Include "estimated_hours" in each issue dict.
-   - Call `batch_create_and_assign_issues` passing the NEW PROJECT'S ID (as a string) and a JSON string of issues (title, description, assignee_username, estimated_hours).
+   - Every issue description MUST be detailed and structured with markdown headers and bullet points as shown above.
+   - ONLY assign tasks to the engineers invited in Step 2 based on their skills.
+   - SUPER CRITICAL: DO NOT INVENT OR HALLUCINATE USERNAMES. You MUST ONLY use exact usernames from `get_company_directory()`.
+   - ESTIMATED HOURS: Use values from this range: 2, 4, 6, 8, 10, 12, 16. Larger grouped issues (like full CRUD or complex pages) should be 8-16 hours. Small integration tasks can be 2-4 hours.
+   - Call `batch_create_and_assign_issues` passing the NEW PROJECT'S ID (as a string) and a JSON string of issues.
+   - FINAL CHECK: Count your issues. If you have fewer than 15, you MUST go back and add more. Split complex issues, add more pages, or add more backend services.
 
    FINAL OUTPUT:
    - After steps complete, return a STRICT JSON OBJECT. NO markdown, NO conversational text.
-   - IMPORTANT: The "issues" array MUST list EVERY SINGLE issue you created. Do NOT truncate or abbreviate.
+   - IMPORTANT: The "issues" array MUST list EVERY SINGLE issue you created (minimum 15). Do NOT truncate.
    {
      "zero_to_one": {
        "project_id": "THE_ACTUAL_SAVED_PROJECT_ID",
@@ -319,19 +318,21 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
        "repo_url": "https://gitlab.com/...",
        "team_invited": ["alice.chen", "bob.zhang"],
        "blueprint": {
-         "pages": ["Employee List (/employees)", "Employee Detail (/employees/:id)", "Add Employee (/employees/new)", "Department List (/departments)", "Dashboard (/dashboard)"],
-         "api_endpoints": ["Employee CRUD (5 endpoints)", "Department CRUD (5 endpoints)", "Auth (login, register, me)", "Dashboard (GET /api/stats)"],
-         "database_models": ["Employee (10 fields)", "Department (4 fields)", "User (6 fields)"]
+         "pages": ["Login", "Register", "Dashboard", "Employee List", "Employee Detail", "Employee Form", "Department List", "Department Detail", "Settings", "Profile"],
+         "api_endpoints": ["Auth (4 endpoints)", "Employee CRUD (5)", "Department CRUD (5)", "Dashboard (2)", "Settings (3)"],
+         "database_models": ["User (7 fields)", "Employee (10 fields)", "Department (5 fields)", "AuditLog (6 fields)"]
        },
-       "issues_created": 18,
+       "issues_created": 20,
        "issues": [
-         { "title": "Data: Define all database schemas and models", "iid": 1, "assigned_to": "bob.zhang", "reason": "Backend expert", "estimated_hours": 6 },
-         { "title": "Backend: Employee API - full CRUD endpoints", "iid": 2, "assigned_to": "bob.zhang", "reason": "API specialist", "estimated_hours": 8 },
-         { "title": "Backend: Department API - full CRUD endpoints", "iid": 3, "assigned_to": "bob.zhang", "reason": "API specialist", "estimated_hours": 6 },
-         { "title": "Backend: Auth middleware, JWT & password hashing", "iid": 4, "assigned_to": "bob.zhang", "reason": "Security-aware backend dev", "estimated_hours": 6 },
-         { "title": "Frontend: Employee List page", "iid": 5, "assigned_to": "alice.chen", "reason": "React specialist", "estimated_hours": 6 },
-         { "title": "Frontend: Employee Detail page", "iid": 6, "assigned_to": "alice.chen", "reason": "React specialist", "estimated_hours": 6 },
-         { "title": "Frontend: Dashboard page", "iid": 7, "assigned_to": "alice.chen", "reason": "UI/data visualization", "estimated_hours": 8 }
+         { "title": "Data: Core entity schemas (User, Employee, Department)", "iid": 1, "assigned_to": "bob.zhang", "reason": "Backend expert", "estimated_hours": 10 },
+         { "title": "Data: Supporting schemas (AuditLog, Settings)", "iid": 2, "assigned_to": "bob.zhang", "reason": "Backend expert", "estimated_hours": 6 },
+         { "title": "Backend: Employee API - Read endpoints (List & Detail)", "iid": 3, "assigned_to": "bob.zhang", "reason": "API specialist", "estimated_hours": 8 },
+         { "title": "Backend: Employee API - Write endpoints (Create, Update, Delete)", "iid": 4, "assigned_to": "bob.zhang", "reason": "API specialist", "estimated_hours": 8 },
+         { "title": "Backend: Auth system (login, register, JWT, middleware)", "iid": 5, "assigned_to": "bob.zhang", "reason": "Security-aware", "estimated_hours": 12 },
+         { "title": "Frontend: Dashboard page with charts & stats", "iid": 6, "assigned_to": "alice.chen", "reason": "UI specialist", "estimated_hours": 12 },
+         { "title": "Frontend: Employee List page", "iid": 7, "assigned_to": "alice.chen", "reason": "React specialist", "estimated_hours": 8 },
+         { "title": "Frontend: Employee Detail & Edit page", "iid": 8, "assigned_to": "alice.chen", "reason": "React specialist", "estimated_hours": 8 },
+         { "title": "Frontend: Auth flow (Login & Register pages)", "iid": 9, "assigned_to": "alice.chen", "reason": "Frontend auth", "estimated_hours": 8 }
        ],
        "steps_completed": ["Repository Created", "Project Scaffolded", "Team Auto-Invited", "Blueprint Designed", "Tasks Grouped & Dispatched"]
      }
