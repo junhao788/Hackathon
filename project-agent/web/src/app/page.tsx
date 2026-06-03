@@ -237,22 +237,49 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
 
   const teamSize = boardData.team_size || 1;
   const perPersonCapacity = boardData.per_person_capacity_hours || 25;
-  const sprintCapacity = boardData.sprint_capacity_hours || (teamSize * perPersonCapacity);
-  const sprintUsed = boardData.sprint_used_hours || 0;
-  const capacityPct = Math.min((sprintUsed / sprintCapacity) * 100, 100);
-  const capacityColor = capacityPct > 90 ? 'bg-red-500' : capacityPct > 70 ? 'bg-amber-500' : 'bg-emerald-500';
+  
+  // Calculate individual active workloads (only open tasks)
+  const workloads: Record<string, number> = {};
+  if (boardData.board) {
+    boardData.board.forEach((col: any) => {
+      col.cards?.forEach((card: any) => {
+        if (!card.checked) {
+          const assignee = card.assigned_to || 'Unassigned';
+          workloads[assignee] = (workloads[assignee] || 0) + (card.estimated_hours || 0);
+        }
+      });
+    });
+  }
+
+  const assigneeKeys = Object.keys(workloads).sort();
 
   return (
     <div className="flex flex-col gap-6 w-full h-full pb-4">
-      {/* Capacity Header */}
-      {sprintUsed > 0 && (
-        <div className="flex items-center gap-3 px-2 shrink-0">
-          <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-          <div className="flex-1 h-2.5 bg-surface/60 rounded-full border border-border/50 overflow-hidden">
-            <div className={`h-full ${capacityColor} rounded-full transition-all duration-500`} style={{ width: `${capacityPct}%` }} />
-          </div>
-          <span className="text-xs font-mono font-bold text-text-secondary shrink-0">{sprintUsed}/{sprintCapacity}h</span>
-          {teamSize > 1 && <span className="text-[10px] text-text-tertiary shrink-0">({teamSize} devs × {perPersonCapacity}h)</span>}
+      {/* Individual Capacity Headers */}
+      {assigneeKeys.length > 0 && (
+        <div className="flex flex-col gap-2 shrink-0 bg-surface/20 border border-border/30 rounded-xl p-3">
+          <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">Active Workload</div>
+          {assigneeKeys.map(assignee => {
+            const used = workloads[assignee];
+            const capacity = assignee === 'Unassigned' ? (used || 1) : perPersonCapacity; // Don't show fake capacity for unassigned
+            const pct = Math.min((used / capacity) * 100, 100);
+            const color = pct > 90 ? 'bg-red-500' : pct > 70 ? 'bg-amber-500' : 'bg-emerald-500';
+            
+            return (
+              <div key={assignee} className="flex items-center gap-3">
+                <div className="w-24 shrink-0 flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-cyan-900/40 border border-cyan-500/30 flex items-center justify-center shrink-0">
+                    <span className="text-[10px] font-bold text-cyan-400 uppercase">{assignee.charAt(0)}</span>
+                  </div>
+                  <span className="text-xs font-medium text-text-primary truncate">{assignee}</span>
+                </div>
+                <div className="flex-1 h-2 bg-surface/60 rounded-full border border-border/50 overflow-hidden">
+                  <div className={`h-full ${color} rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
+                </div>
+                <span className="text-xs font-mono font-bold text-text-secondary shrink-0 w-12 text-right">{used}{assignee !== 'Unassigned' ? `/${capacity}h` : 'h'}</span>
+              </div>
+            );
+          })}
         </div>
       )}
       

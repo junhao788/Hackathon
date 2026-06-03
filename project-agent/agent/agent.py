@@ -138,6 +138,7 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
    - SPRINT CAPACITY RULE: Each developer gets 25 hours per 7-day sprint. Calculate total sprint capacity as: (number of developers) × 25 hours. The combined total estimated_hours of ALL cards in P0 CRITICAL + P1 HIGH PRIORITY columns MUST NOT exceed this total capacity. If adding a card would exceed the capacity, move it to BACKLOG instead.
    - CRITICAL: You MUST place ALL REMAINING open issues that were not selected for P0 or P1 into the "BACKLOG" column! Do NOT drop or ignore any open issues. Every single open issue must appear in the JSON output.
    - Each card MUST include an "estimated_hours" field (number: 1, 2, 3, 4, 6, or 8). Estimate based on task complexity.
+   - Each card MUST include an "assigned_to" field with the username of the assignee (e.g. "alice.chen"). If unassigned, set it to null.
    - YOU MUST RETURN A STRICT JSON OBJECT in the following format. NO markdown code blocks, NO conversational text before or after the JSON.
    {
      "team_size": 3,
@@ -147,15 +148,15 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
      "board": [
        {
          "columnName": "P0 CRITICAL",
-         "cards": [ { "title": "...", "description": "...", "badges": ["High", "Bug"], "checked": false, "estimated_hours": 4 } ]
+         "cards": [ { "title": "...", "description": "...", "badges": ["High", "Bug"], "checked": false, "estimated_hours": 4, "assigned_to": "alice.chen" } ]
        },
        {
          "columnName": "P1 HIGH PRIORITY",
-         "cards": [ { "title": "...", "description": "...", "badges": ["..."], "checked": false, "estimated_hours": 3 } ]
+         "cards": [ { "title": "...", "description": "...", "badges": ["..."], "checked": false, "estimated_hours": 3, "assigned_to": null } ]
        },
        {
          "columnName": "BACKLOG",
-         "cards": [ { "title": "...", "description": "...", "badges": ["..."], "checked": false, "estimated_hours": 2 } ]
+         "cards": [ { "title": "...", "description": "...", "badges": ["..."], "checked": false, "estimated_hours": 2, "assigned_to": "bob.zhang" } ]
        }
      ]
    }
