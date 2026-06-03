@@ -1117,8 +1117,13 @@ export default function Dashboard() {
               
               setZeroProgress(p => [...p, '💾 Saving Sprint Plan to Database...']);
               let pureJson = sprintPlanResult;
-              const jsonMatch = sprintPlanResult.match(/\{[\s\S]*\}/);
-              if (jsonMatch) pureJson = jsonMatch[0];
+              const jsonMatch = sprintPlanResult.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+              if (jsonMatch) {
+                pureJson = jsonMatch[1];
+              } else {
+                const match2 = sprintPlanResult.match(/\{[\s\S]*\}/);
+                if (match2) pureJson = match2[0];
+              }
               
               await fetch(`https://hackathon-030e.onrender.com/api/sprints/${newProjectId}`, {
                 method: 'POST',
