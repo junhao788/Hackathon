@@ -375,7 +375,8 @@ async def chat(request: ChatRequest):
                         assigned_issues.append({
                             "iid": issue.get("iid"),
                             "title": issue.get("title"),
-                            "state": issue.get("state")
+                            "state": issue.get("state"),
+                            "description": issue.get("description", "")
                         })
                 
                 dashboard.append({

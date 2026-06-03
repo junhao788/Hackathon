@@ -2129,9 +2129,6 @@ export default function Dashboard() {
                                               <span className={`text-xs transition-colors truncate ${issue.state === 'closed' ? 'text-text-tertiary line-through' : 'text-text-secondary group-hover:text-text-primary'}`}>{issue.title}</span>
                                             </div>
                                           </div>
-                                          <a href={issue.web_url} target="_blank" rel="noreferrer" className="shrink-0 p-1 hover:bg-surface rounded text-text-tertiary hover:text-accent transition-colors ml-2" onClick={(e) => e.stopPropagation()}>
-                                            <ExternalLink className="w-3.5 h-3.5" />
-                                          </a>
                                         </div>
                                         {isExpanded && issue.description && (
                                           <div className="pl-14 pr-4 pb-3 pt-0">
