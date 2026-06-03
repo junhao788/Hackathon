@@ -327,7 +327,18 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
                        </p>
                     </div>
                     
-                    {/* Badges Removed per user request */}
+                    {/* Badges */}
+                    {card.badges && card.badges.length > 0 && (
+                      <div className="flex shrink-0 gap-1.5 hidden md:flex">
+                        {card.badges
+                          .filter((b: string) => !['high', 'medium', 'low', 'critical', 'p0', 'p1'].includes(b.toLowerCase()))
+                          .map((badge: string, bIdx: number) => (
+                          <span key={bIdx} className={`text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-border/50 text-text-secondary bg-surface/40 group-hover:border-border/80 transition-colors`}>
+                            {badge}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     
                     {/* Time Estimate */}
                     {card.estimated_hours && (
