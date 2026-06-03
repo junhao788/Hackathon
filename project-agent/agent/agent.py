@@ -148,15 +148,15 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
      "board": [
        {
          "columnName": "P0 CRITICAL",
-         "cards": [ { "title": "...", "description": "...", "badges": ["High", "Bug"], "checked": false, "estimated_hours": 4, "assigned_to": "alice.chen" } ]
+         "cards": [ { "title": "...", "description": "...", "checked": false, "estimated_hours": 4, "assigned_to": "alice.chen" } ]
        },
        {
          "columnName": "P1 HIGH PRIORITY",
-         "cards": [ { "title": "...", "description": "...", "badges": ["..."], "checked": false, "estimated_hours": 3, "assigned_to": null } ]
+         "cards": [ { "title": "...", "description": "...", "checked": false, "estimated_hours": 3, "assigned_to": null } ]
        },
        {
          "columnName": "BACKLOG",
-         "cards": [ { "title": "...", "description": "...", "badges": ["..."], "checked": false, "estimated_hours": 2, "assigned_to": "bob.zhang" } ]
+         "cards": [ { "title": "...", "description": "...", "checked": false, "estimated_hours": 2, "assigned_to": "bob.zhang" } ]
        }
      ]
    }

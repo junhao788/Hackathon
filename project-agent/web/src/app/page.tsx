@@ -327,16 +327,7 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
                        </p>
                     </div>
                     
-                    {/* Badges */}
-                    {card.badges && card.badges.length > 0 && (
-                      <div className="flex shrink-0 gap-1.5 hidden md:flex">
-                        {card.badges.map((badge: string, bIdx: number) => (
-                          <span key={bIdx} className={`text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-border/50 text-text-secondary bg-surface/40 group-hover:border-border/80 transition-colors`}>
-                            {badge}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    {/* Badges Removed per user request */}
                     
                     {/* Time Estimate */}
                     {card.estimated_hours && (
@@ -1689,18 +1680,6 @@ export default function Dashboard() {
                             >
                               <Zap className={`w-4 h-4 ${autoGeneratingSprintId === sprint.sprint_id ? 'animate-pulse' : ''}`} />
                               {autoGeneratingSprintId === sprint.sprint_id ? 'Auto-Planning...' : 'Complete & Auto-Plan Next'}
-                            </button>
-                            <button
-                              onClick={() => handleSyncSprint(sprint)}
-                              disabled={syncingSprintId === sprint.sprint_id}
-                              className={`px-3 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/10 ${
-                                syncingSprintId === sprint.sprint_id
-                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 cursor-not-allowed'
-                                  : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 hover:shadow-emerald-500/30'
-                              }`}
-                            >
-                              <Bot className={`w-4 h-4 ${syncingSprintId === sprint.sprint_id ? 'animate-pulse' : ''}`} />
-                              {syncingSprintId === sprint.sprint_id ? 'AI Syncing...' : 'Sync AI Progress'}
                             </button>
                           </div>
                         </div>
