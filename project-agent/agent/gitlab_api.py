@@ -838,3 +838,28 @@ def post_issue_comment(project_id: str, issue_iid: int, body: str) -> dict:
     if resp.status_code == 201:
         return {"status": "success"}
     return {"error": f"Failed to post issue comment: {resp.text[:200]}"}
+
+def setup_gitlab_webhook(project_id: str):
+    """Automatically registers our backend webhook for issues and MRs if not present."""
+    webhook_url = "https://hackathon-030e.onrender.com/api/webhook/gitlab"
+    
+    # Check existing hooks
+    url = f"{GITLAB_API_URL}/projects/{project_id}/hooks"
+    resp = requests.get(url, headers=HEADERS)
+    if resp.status_code == 200:
+        for hook in resp.json():
+            if hook.get("url") == webhook_url:
+                return {"status": "exists", "id": hook.get("id")}
+                
+    # Create new hook
+    payload = {
+        "url": webhook_url,
+        "issues_events": True,
+        "merge_requests_events": True,
+        "push_events": False,
+        "enable_ssl_verification": False
+    }
+    create_resp = requests.post(url, headers=HEADERS, json=payload)
+    if create_resp.status_code in [200, 201]:
+        return {"status": "created"}
+    return {"error": create_resp.text}

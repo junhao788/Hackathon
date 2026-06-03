@@ -605,6 +605,8 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
+    let sprintIntervalId: NodeJS.Timeout | null = null;
+    
     if (activeTab === 'techlead' && selectedProjectId) {
       fetchTechReviews();
       const interval = setInterval(() => fetchTechReviews(), 15000);
@@ -612,11 +614,19 @@ export default function Dashboard() {
     }
     if (activeTab === 'sprint' && selectedProjectId) {
       fetchSprintHistory();
-      const interval = setInterval(() => fetchSprintHistory(), 20000);
-      return () => clearInterval(interval);
+      // Fast polling (5s) for Sprint History to reflect automatic webhook updates (MR merge/Issue close)
+      // This is cheap because it just reads a local JSON file, unlike the heavy GitLab API calls.
+      sprintIntervalId = setInterval(() => {
+        fetchSprintHistory();
+      }, 5000);
     }
+    
     // Team Workload: NO auto-fetch, NO interval.
     // User must click "Sync Team Data" manually to avoid OOM crashes on Render free tier.
+    
+    return () => {
+      if (sprintIntervalId) clearInterval(sprintIntervalId);
+    };
   }, [activeTab, selectedProjectId]);
 
   const handleSaveSprint = async () => {

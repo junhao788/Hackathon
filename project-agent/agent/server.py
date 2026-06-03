@@ -109,7 +109,65 @@ async def save_sprint_history(project_id: str, request: SprintSaveRequest):
         with open(SPRINT_HISTORY_PATH, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
             
+        # Fire off webhook setup in the background
+        from agent.gitlab_api import setup_gitlab_webhook
+        asyncio.create_task(asyncio.to_thread(setup_gitlab_webhook, project_id))
+            
         return {"status": "success", "sprint_id": sprint_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ── GitLab Webhook for Auto-Sync ──────────────────────────────────────────
+
+@app.post("/api/webhook/gitlab")
+async def gitlab_webhook(request: Request):
+    try:
+        payload = await request.json()
+        object_kind = payload.get("object_kind")
+        project = payload.get("project", {})
+        project_id = str(project.get("id"))
+        
+        if not project_id:
+            return {"status": "ignored", "reason": "No project ID"}
+            
+        attributes = payload.get("object_attributes", {})
+        action = attributes.get("action")
+        state = attributes.get("state")
+        title = attributes.get("title")
+        
+        is_issue_close = object_kind == "issue" and action == "close" and state == "closed"
+        is_mr_merge = object_kind == "merge_request" and action == "merge" and state == "merged"
+        
+        if not (is_issue_close or is_mr_merge) or not title:
+            return {"status": "ignored", "reason": "Not a close/merge event or missing title"}
+            
+        if not os.path.exists(SPRINT_HISTORY_PATH):
+            return {"status": "ignored", "reason": "No sprint history"}
+            
+        with open(SPRINT_HISTORY_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            
+        sprints = data.get(project_id, [])
+        if not sprints:
+            return {"status": "ignored", "reason": "No sprints for this project"}
+            
+        active_sprint = sprints[0]
+        board = active_sprint.get("board", [])
+        
+        updated = False
+        for col in board:
+            for card in col.get("cards", []):
+                # Loose matching to handle minor differences
+                if card.get("title", "").strip().lower() == title.strip().lower():
+                    card["checked"] = True
+                    updated = True
+                    
+        if updated:
+            with open(SPRINT_HISTORY_PATH, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            return {"status": "success", "message": f"Auto-synced '{title}' as closed."}
+            
+        return {"status": "ignored", "reason": "Task not found in active sprint"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
