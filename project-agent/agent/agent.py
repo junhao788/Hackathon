@@ -133,7 +133,7 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
 
 4. SPRINT PROTOCOL:
    - Call list_project_issues(state='opened'), list_merge_requests(state='opened')
-   - Call get_project_members(project_id) to count the number of developers on the team.
+   - Call get_project_members(project_id) to count the number of developers on the team. CRITICAL: Do NOT count 'howwerd0898' (Werd How), anyone with `"assignable": false`, or Product Managers. Only count actual developers.
    - Draft a sprint plan prioritizing issues.
    - SPRINT CAPACITY RULE: Each developer gets 25 hours per 7-day sprint. Calculate total sprint capacity as: (number of developers) × 25 hours. The combined total estimated_hours of ALL cards in P0 CRITICAL + P1 HIGH PRIORITY columns MUST NOT exceed this total capacity. If adding a card would exceed the capacity, move it to BACKLOG instead.
    - CRITICAL: You MUST place ALL REMAINING open issues that were not selected for P0 or P1 into the "BACKLOG" column! Do NOT drop or ignore any open issues. Every single open issue must appear in the JSON output.
