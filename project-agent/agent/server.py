@@ -337,10 +337,54 @@ async def chat(request: ChatRequest):
             return StreamingResponse(stream_agent_output(), media_type="text/plain")
 
         # ── NORMAL MODE (all other features) ───────────────────────────
-        result = await asyncio.to_thread(
-            _run_agent_sync, adk_exe, agent_dir, final_query, merged_env, base_dir
-        )
-        return result
+        import subprocess as sp
+        from fastapi.responses import StreamingResponse
+
+        async def stream_spaces_then_json():
+            process = sp.Popen(
+                [adk_exe, "run", agent_dir, final_query],
+                env=merged_env,
+                cwd=base_dir,
+                stdout=sp.PIPE,
+                stderr=sp.STDOUT,
+                text=True,
+                bufsize=1
+            )
+
+            full_output = ""
+            while True:
+                # Read line with timeout so we can yield spaces if idle
+                try:
+                    line = await asyncio.wait_for(asyncio.to_thread(process.stdout.readline), timeout=2.0)
+                except asyncio.TimeoutError:
+                    # Still working, send a space to keep Render alive
+                    yield " "
+                    if process.poll() is not None:
+                        break
+                    continue
+
+                if not line and process.poll() is not None:
+                    break
+                
+                if line:
+                    full_output += line
+                    # Yield space to keep connection alive, valid for JSON parsing
+                    yield " "
+
+            # Process finished. Extract final JSON.
+            final_response = full_output.strip()
+            if "[project_agent]:" in final_response:
+                final_response = final_response.split("[project_agent]:")[-1].strip()
+            elif "Agent:" in final_response:
+                final_response = final_response.split("Agent:")[-1].strip()
+
+            if "{" not in final_response:
+                import json
+                yield json.dumps({"error": f"Agent returned no valid JSON. Raw output length: {len(full_output)}"})
+            else:
+                yield final_response
+
+        return StreamingResponse(stream_spaces_then_json(), media_type="application/json")
 
     except Exception as e:
         import traceback
