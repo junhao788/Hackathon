@@ -19,6 +19,9 @@ if sys.platform == 'win32':
 
 app = FastAPI(title="Project Agent API")
 
+# Limit to 1 concurrent AI agent subprocess to prevent OOM on Render's 512MB free tier
+_agent_busy = False
+
 # Allow requests from the Next.js frontend
 app.add_middleware(
     CORSMiddleware,
@@ -287,6 +290,12 @@ def _prepare_agent_env():
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
+    global _agent_busy
+    # Prevent concurrent AI agent calls to avoid OOM on 512MB Render
+    if _agent_busy:
+        return {"response": '{"error": "Agent is busy processing another request. Please wait and try again."}'}
+    
+    _agent_busy = True
     try:
         print(f"Executing Agent with query: {request.message}")
 
@@ -301,6 +310,54 @@ async def chat(request: ChatRequest):
             from fastapi.responses import StreamingResponse
 
             async def stream_agent_output():
+                global _agent_busy
+                try:
+                    process = await asyncio.create_subprocess_exec(
+                        adk_exe, "run", agent_dir, final_query,
+                        env=merged_env,
+                        cwd=base_dir,
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.STDOUT,
+                    )
+
+                    full_output = ""
+                    while True:
+                        line_bytes = await process.stdout.readline()
+                        if not line_bytes and process.returncode is not None:
+                            break
+                        if line_bytes:
+                            line_str = line_bytes.decode('utf-8', errors='replace')
+                            full_output += line_str
+                            yield line_str
+
+                    # Extract final JSON robustly
+                    final_response = full_output.strip()
+                    if "[project_agent]:" in final_response:
+                        final_response = final_response.split("[project_agent]:")[-1].strip()
+                    elif "Agent:" in final_response:
+                        final_response = final_response.split("Agent:")[-1].strip()
+                    else:
+                        start_idx = final_response.find('{')
+                        end_idx = final_response.rfind('}')
+                        if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                            final_response = final_response[start_idx:end_idx+1]
+
+                    yield "\n__FINAL_JSON__\n"
+                    if not final_response.startswith("{"):
+                        yield f'{{"error": "Agent returned no valid JSON. Raw output length: {len(full_output)}"}}'
+                    else:
+                        yield final_response
+                finally:
+                    _agent_busy = False
+
+            return StreamingResponse(stream_agent_output(), media_type="text/plain")
+
+        # ── NORMAL MODE (all other features) ───────────────────────────
+        from fastapi.responses import StreamingResponse
+
+        async def stream_spaces_then_json():
+            global _agent_busy
+            try:
                 process = await asyncio.create_subprocess_exec(
                     adk_exe, "run", agent_dir, final_query,
                     env=merged_env,
@@ -311,91 +368,48 @@ async def chat(request: ChatRequest):
 
                 full_output = ""
                 while True:
-                    line_bytes = await process.stdout.readline()
-                    if not line_bytes and process.returncode is not None:
-                        break
-                    if line_bytes:
-                        line_str = line_bytes.decode('utf-8', errors='replace')
-                        full_output += line_str
-                        yield line_str
+                    try:
+                        line_bytes = await asyncio.wait_for(process.stdout.readline(), timeout=2.0)
+                        
+                        if not line_bytes and process.returncode is not None:
+                            break
+                            
+                        if line_bytes:
+                            full_output += line_bytes.decode('utf-8', errors='replace')
+                            yield " "
+                    except asyncio.TimeoutError:
+                        yield " "
+                        if process.returncode is not None:
+                            break
+                        continue
 
-                # Extract final JSON robustly
+                # Process finished. Extract final JSON robustly
                 final_response = full_output.strip()
                 if "[project_agent]:" in final_response:
                     final_response = final_response.split("[project_agent]:")[-1].strip()
                 elif "Agent:" in final_response:
                     final_response = final_response.split("Agent:")[-1].strip()
                 else:
-                    # Try to extract the JSON block if there are leading logs
                     start_idx = final_response.find('{')
                     end_idx = final_response.rfind('}')
                     if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
                         final_response = final_response[start_idx:end_idx+1]
 
-                yield "\n__FINAL_JSON__\n"
                 if not final_response.startswith("{"):
-                    yield f'{{"error": "Agent returned no valid JSON. Raw output length: {len(full_output)}"}}'
+                    import json
+                    yield json.dumps({"error": f"Agent returned no valid JSON. Raw output length: {len(full_output)}"})
                 else:
-                    yield final_response
-
-            return StreamingResponse(stream_agent_output(), media_type="text/plain")
-
-        # ── NORMAL MODE (all other features) ───────────────────────────
-        from fastapi.responses import StreamingResponse
-
-        async def stream_spaces_then_json():
-            process = await asyncio.create_subprocess_exec(
-                adk_exe, "run", agent_dir, final_query,
-                env=merged_env,
-                cwd=base_dir,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.STDOUT,
-            )
-
-            full_output = ""
-            while True:
-                try:
-                    # Read line fully asynchronously
-                    line_bytes = await asyncio.wait_for(process.stdout.readline(), timeout=2.0)
-                    
-                    if not line_bytes and process.returncode is not None:
-                        break
-                        
-                    if line_bytes:
-                        full_output += line_bytes.decode('utf-8', errors='replace')
-                        yield " "  # Yield space on output
-                except asyncio.TimeoutError:
-                    # Still working, send a space to keep Render alive
-                    yield " "
-                    if process.returncode is not None:
-                        break
-                    continue
-
-            # Process finished. Extract final JSON robustly
-            final_response = full_output.strip()
-            if "[project_agent]:" in final_response:
-                final_response = final_response.split("[project_agent]:")[-1].strip()
-            elif "Agent:" in final_response:
-                final_response = final_response.split("Agent:")[-1].strip()
-            else:
-                start_idx = final_response.find('{')
-                end_idx = final_response.rfind('}')
-                if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
-                    final_response = final_response[start_idx:end_idx+1]
-
-            if not final_response.startswith("{"):
-                import json
-                yield json.dumps({"error": f"Agent returned no valid JSON. Raw output length: {len(full_output)}"})
-            else:
-                import json
-                # Wrap in {"response": ...} envelope to match what frontend expects
-                yield json.dumps({"response": final_response})
+                    import json
+                    yield json.dumps({"response": final_response})
+            finally:
+                _agent_busy = False
 
         return StreamingResponse(stream_spaces_then_json(), media_type="application/json")
 
     except Exception as e:
         import traceback
         print(f"Error during agent execution: {traceback.format_exc()}")
+        _agent_busy = False
         if isinstance(e, HTTPException):
             raise e
         raise HTTPException(status_code=500, detail=str(e))

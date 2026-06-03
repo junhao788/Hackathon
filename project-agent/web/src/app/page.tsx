@@ -437,11 +437,13 @@ export default function Dashboard() {
       fetchDashboardMetrics(selectedProjectId);
       const interval = setInterval(() => fetchDashboardMetrics(selectedProjectId), 20000);
       
-      // 2. Prefetch data for other tabs so they load instantly when clicked
+      // 2. Prefetch LIGHTWEIGHT data only (no AI agent calls to avoid OOM on 512MB Render)
       fetchTechReviews();
       fetchSprintHistory();
-      fetchTeamWorkload();
       fetchRoster();
+      // NOTE: fetchTeamWorkload() is intentionally NOT called here.
+      // It triggers the AI agent which uses 300MB+ RAM and crashes Render's 512MB free tier.
+      // User must manually click "Sync Team Data" to trigger it.
       
       return () => clearInterval(interval);
     }
@@ -583,11 +585,8 @@ export default function Dashboard() {
       const interval = setInterval(() => fetchSprintHistory(), 20000);
       return () => clearInterval(interval);
     }
-    if (activeTab === 'team' && selectedProjectId) {
-      fetchTeamWorkload();
-      const interval = setInterval(() => fetchTeamWorkload(), 30000);
-      return () => clearInterval(interval);
-    }
+    // Team Workload: NO auto-fetch, NO interval.
+    // User must click "Sync Team Data" manually to avoid OOM crashes on Render free tier.
   }, [activeTab, selectedProjectId]);
 
   const handleSaveSprint = async () => {
