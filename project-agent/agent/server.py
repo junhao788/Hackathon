@@ -319,15 +319,21 @@ async def chat(request: ChatRequest):
                         full_output += line_str
                         yield line_str
 
-                # Extract final JSON
+                # Extract final JSON robustly
                 final_response = full_output.strip()
                 if "[project_agent]:" in final_response:
                     final_response = final_response.split("[project_agent]:")[-1].strip()
                 elif "Agent:" in final_response:
                     final_response = final_response.split("Agent:")[-1].strip()
+                else:
+                    # Try to extract the JSON block if there are leading logs
+                    start_idx = final_response.find('{')
+                    end_idx = final_response.rfind('}')
+                    if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                        final_response = final_response[start_idx:end_idx+1]
 
                 yield "\n__FINAL_JSON__\n"
-                if "{" not in final_response:
+                if not final_response.startswith("{"):
                     yield f'{{"error": "Agent returned no valid JSON. Raw output length: {len(full_output)}"}}'
                 else:
                     yield final_response
@@ -365,14 +371,19 @@ async def chat(request: ChatRequest):
                         break
                     continue
 
-            # Process finished. Extract final JSON.
+            # Process finished. Extract final JSON robustly
             final_response = full_output.strip()
             if "[project_agent]:" in final_response:
                 final_response = final_response.split("[project_agent]:")[-1].strip()
             elif "Agent:" in final_response:
                 final_response = final_response.split("Agent:")[-1].strip()
+            else:
+                start_idx = final_response.find('{')
+                end_idx = final_response.rfind('}')
+                if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                    final_response = final_response[start_idx:end_idx+1]
 
-            if "{" not in final_response:
+            if not final_response.startswith("{"):
                 import json
                 yield json.dumps({"error": f"Agent returned no valid JSON. Raw output length: {len(full_output)}"})
             else:
