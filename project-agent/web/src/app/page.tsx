@@ -238,17 +238,22 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
   const teamSize = boardData.team_size || 1;
   const perPersonCapacity = boardData.per_person_capacity_hours || 25;
   
-  // Calculate individual active workloads (only open tasks)
+  // Calculate individual active workloads (only P0 CRITICAL + P1 HIGH PRIORITY, exclude BACKLOG)
   const workloads: Record<string, number> = {};
   if (boardData.board) {
-    boardData.board.forEach((col: any) => {
-      col.cards?.forEach((card: any) => {
-        if (!card.checked) {
-          const assignee = card.assigned_to || 'Unassigned';
-          workloads[assignee] = (workloads[assignee] || 0) + (card.estimated_hours || 0);
-        }
+    boardData.board
+      .filter((col: any) => {
+        const name = (col.columnName || '').toUpperCase();
+        return name.includes('P0') || name.includes('P1') || name.includes('CRITICAL') || name.includes('HIGH');
+      })
+      .forEach((col: any) => {
+        col.cards?.forEach((card: any) => {
+          if (!card.checked) {
+            const assignee = card.assigned_to || 'Unassigned';
+            workloads[assignee] = (workloads[assignee] || 0) + (card.estimated_hours || 0);
+          }
+        });
       });
-    });
   }
 
   const assigneeKeys = Object.keys(workloads).sort();
