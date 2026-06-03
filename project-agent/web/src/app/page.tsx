@@ -195,6 +195,15 @@ const StandupRenderer = ({ text }: { text?: string }) => {
 };
 
 const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inputBoardData?: any }) => {
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+
+  const toggleCard = (cardId: string) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [cardId]: !prev[cardId]
+    }));
+  };
+
   if (!text && !inputBoardData) return null;
 
   let boardData: any = inputBoardData;
