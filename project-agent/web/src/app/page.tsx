@@ -314,57 +314,72 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
               
               {/* Linear-style List Container */}
               <div className="flex flex-col bg-surface/20 border border-border/40 rounded-xl overflow-hidden shadow-sm">
-                {col.cards && col.cards.map((card: any, cardIdx: number) => (
-                  <div key={cardIdx} className={`group flex items-center gap-3 p-3 border-b border-border/30 last:border-b-0 hover:bg-surface/50 transition-colors cursor-default ${card.checked ? 'opacity-60 bg-surface/10' : ''}`}>
-                    {/* Status Icon */}
-                    <div className="shrink-0 pl-1">
-                      {card.checked ? (
-                         <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      ) : (
-                         <div className={`w-4 h-4 rounded-full border border-dashed ${colors.text.replace('text-', 'border-')} opacity-50 group-hover:opacity-100 transition-opacity`} />
+                {col.cards && col.cards.map((card: any, cardIdx: number) => {
+                  const cardId = `sprint-${cIdx}-${cardIdx}`;
+                  const isExpanded = expandedCards[cardId];
+                  return (
+                  <div key={cardIdx} className={`flex flex-col border-b border-border/30 last:border-b-0 ${card.checked ? 'opacity-60 bg-surface/10' : ''}`}>
+                    <div 
+                      onClick={() => toggleCard(cardId)}
+                      className="group flex items-center gap-3 p-3 hover:bg-surface/50 transition-colors cursor-pointer"
+                    >
+                      {/* Status Icon */}
+                      <div className="shrink-0 pl-1">
+                        {card.checked ? (
+                           <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                        ) : (
+                           <div className={`w-4 h-4 rounded-full border border-dashed ${colors.text.replace('text-', 'border-')} opacity-50 group-hover:opacity-100 transition-opacity`} />
+                        )}
+                      </div>
+                      
+                      {/* Title */}
+                      <div className="flex-1 min-w-0">
+                         <p className={`text-sm font-medium text-text-primary truncate ${card.checked ? 'line-through text-text-secondary' : ''}`}>
+                           {card.title}
+                         </p>
+                      </div>
+                      
+                      {/* Badges */}
+                      {card.badges && card.badges.length > 0 && (
+                        <div className="flex shrink-0 gap-1.5 hidden md:flex">
+                          {card.badges
+                            .filter((b: string) => !['high', 'medium', 'low', 'critical', 'p0', 'p1'].includes(b.toLowerCase()))
+                            .map((badge: string, bIdx: number) => (
+                            <span key={bIdx} className={`text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-border/50 text-text-secondary bg-surface/40 group-hover:border-border/80 transition-colors`}>
+                              {badge}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Time Estimate */}
+                      {card.estimated_hours && (
+                        <div className="shrink-0 flex items-center justify-end min-w-[32px] ml-2">
+                          <span className="text-xs font-mono text-amber-500/80 group-hover:text-amber-400 transition-colors">{card.estimated_hours}h</span>
+                        </div>
+                      )}
+                      
+                      {/* Assignee */}
+                      {card.assigned_to && (
+                        <div className="shrink-0 flex items-center gap-2 pl-3 ml-3 border-l border-border/40">
+                           <div className="w-5 h-5 rounded-full bg-cyan-900/40 border border-cyan-500/30 flex items-center justify-center">
+                              <span className="text-[10px] font-bold text-cyan-400 uppercase">{card.assigned_to.charAt(0)}</span>
+                           </div>
+                           <span className="text-xs text-text-secondary hidden lg:inline-block truncate max-w-[80px]">
+                             {card.assigned_to}
+                           </span>
+                        </div>
                       )}
                     </div>
-                    
-                    {/* Title */}
-                    <div className="flex-1 min-w-0">
-                       <p className={`text-sm font-medium text-text-primary truncate ${card.checked ? 'line-through text-text-secondary' : ''}`}>
-                         {card.title}
-                       </p>
-                    </div>
-                    
-                    {/* Badges */}
-                    {card.badges && card.badges.length > 0 && (
-                      <div className="flex shrink-0 gap-1.5 hidden md:flex">
-                        {card.badges
-                          .filter((b: string) => !['high', 'medium', 'low', 'critical', 'p0', 'p1'].includes(b.toLowerCase()))
-                          .map((badge: string, bIdx: number) => (
-                          <span key={bIdx} className={`text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-border/50 text-text-secondary bg-surface/40 group-hover:border-border/80 transition-colors`}>
-                            {badge}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {/* Time Estimate */}
-                    {card.estimated_hours && (
-                      <div className="shrink-0 flex items-center justify-end min-w-[32px] ml-2">
-                        <span className="text-xs font-mono text-amber-500/80 group-hover:text-amber-400 transition-colors">{card.estimated_hours}h</span>
-                      </div>
-                    )}
-                    
-                    {/* Assignee */}
-                    {card.assigned_to && (
-                      <div className="shrink-0 flex items-center gap-2 pl-3 ml-3 border-l border-border/40">
-                         <div className="w-5 h-5 rounded-full bg-cyan-900/40 border border-cyan-500/30 flex items-center justify-center">
-                            <span className="text-[10px] font-bold text-cyan-400 uppercase">{card.assigned_to.charAt(0)}</span>
-                         </div>
-                         <span className="text-xs text-text-secondary hidden lg:inline-block truncate max-w-[80px]">
-                           {card.assigned_to}
-                         </span>
+                    {isExpanded && card.description && (
+                      <div className="pl-10 pr-4 pb-3 pt-1">
+                        <div className="border border-cyan-500/50 p-3 bg-cyan-950/20 text-sm text-text-secondary whitespace-pre-wrap rounded-md">
+                          {card.description}
+                        </div>
                       </div>
                     )}
                   </div>
-                ))}
+                )})}
                 
                 {(!col.cards || col.cards.length === 0) && (
                   <div className="p-4 flex items-center gap-2 text-text-tertiary text-xs italic">
@@ -436,6 +451,14 @@ export default function Dashboard() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [dashboardMetrics, setDashboardMetrics] = useState<any>(null);
   const [isLoadingMetrics, setIsLoadingMetrics] = useState(false);
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+
+  const toggleCard = (cardId: string) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [cardId]: !prev[cardId]
+    }));
+  };
   
   const fetchProjects = async () => {
     try {
@@ -2067,24 +2090,44 @@ export default function Dashboard() {
                                 {/* Tier 2: Task List */}
                                 <div className="flex flex-col">
                                   {dev.assigned_issues && dev.assigned_issues.length > 0 ? (
-                                    dev.assigned_issues.map((issue: any, iIdx: number) => (
-                                      <a key={iIdx} href={issue.web_url} target="_blank" rel="noreferrer" className="group flex items-center gap-3 px-4 py-2.5 border-b border-border/20 last:border-b-0 hover:bg-surface/30 transition-colors">
-                                        {/* Indentation line & Icon */}
-                                        <div className="flex items-center gap-3 shrink-0">
-                                          <div className="w-4 h-px bg-border/40 ml-2"></div>
-                                          {issue.state === 'closed' ? (
-                                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 opacity-80 shrink-0" />
-                                          ) : (
-                                            <div className="w-3 h-3 rounded-full border border-dashed border-accent/50 opacity-60 group-hover:opacity-100 group-hover:border-solid transition-all bg-accent/10 shrink-0" />
-                                          )}
+                                    dev.assigned_issues.map((issue: any, iIdx: number) => {
+                                      const cardId = `team-${dev.username}-${iIdx}`;
+                                      const isExpanded = expandedCards[cardId];
+                                      return (
+                                      <div key={iIdx} className="flex flex-col border-b border-border/20 last:border-b-0 hover:bg-surface/30 transition-colors">
+                                        <div 
+                                          onClick={() => toggleCard(cardId)}
+                                          className="group flex items-center justify-between px-4 py-2.5 cursor-pointer"
+                                        >
+                                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                                            {/* Indentation line & Icon */}
+                                            <div className="flex items-center gap-3 shrink-0">
+                                              <div className="w-4 h-px bg-border/40 ml-2"></div>
+                                              {issue.state === 'closed' ? (
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 opacity-80 shrink-0" />
+                                              ) : (
+                                                <div className="w-3 h-3 rounded-full border border-dashed border-accent/50 opacity-60 group-hover:opacity-100 group-hover:border-solid transition-all bg-accent/10 shrink-0" />
+                                              )}
+                                            </div>
+                                            {/* Task Info */}
+                                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                                              <span className="text-xs font-mono text-accent/80 font-bold shrink-0">#{issue.iid}</span>
+                                              <span className={`text-xs transition-colors truncate ${issue.state === 'closed' ? 'text-text-tertiary line-through' : 'text-text-secondary group-hover:text-text-primary'}`}>{issue.title}</span>
+                                            </div>
+                                          </div>
+                                          <a href={issue.web_url} target="_blank" rel="noreferrer" className="shrink-0 p-1 hover:bg-surface rounded text-text-tertiary hover:text-accent transition-colors ml-2" onClick={(e) => e.stopPropagation()}>
+                                            <ExternalLink className="w-3.5 h-3.5" />
+                                          </a>
                                         </div>
-                                        {/* Task Info */}
-                                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                                          <span className="text-xs font-mono text-accent/80 font-bold shrink-0">#{issue.iid}</span>
-                                          <span className={`text-xs transition-colors truncate ${issue.state === 'closed' ? 'text-text-tertiary line-through' : 'text-text-secondary group-hover:text-text-primary'}`}>{issue.title}</span>
-                                        </div>
-                                      </a>
-                                    ))
+                                        {isExpanded && issue.description && (
+                                          <div className="pl-14 pr-4 pb-3 pt-0">
+                                            <div className="border border-cyan-500/50 p-3 bg-cyan-950/20 text-xs text-text-secondary whitespace-pre-wrap rounded-md">
+                                              {issue.description}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )})
                                   ) : (
                                     <div className="flex items-center gap-3 px-4 py-3 text-text-tertiary text-xs italic bg-surface/10">
                                       <div className="w-4 h-px bg-border/40 ml-2 shrink-0"></div>
