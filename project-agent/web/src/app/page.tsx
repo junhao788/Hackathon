@@ -1653,7 +1653,43 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </div>
-              ) : null}
+              ) : (
+                <div className="dashboard-card flex flex-col items-center justify-center min-h-[400px]">
+                  <div className="text-center max-w-md">
+                    <CalendarDays className="w-16 h-16 text-text-tertiary opacity-20 mx-auto mb-6" />
+                    <h3 className="text-xl font-bold text-text-primary mb-2">No Sprints Yet</h3>
+                    <p className="text-sm text-text-secondary mb-8">
+                      Generate your first AI-powered Sprint to automatically plan, assign, and track tasks based on your GitLab issues.
+                    </p>
+                    <button 
+                      onClick={handleGenerateSprint}
+                      disabled={loadingSprint}
+                      className="px-6 py-3 bg-accent text-background font-bold rounded-xl hover:bg-accent-hover transition-all flex items-center justify-center gap-2 mx-auto shadow-lg shadow-accent/20"
+                    >
+                      {loadingSprint ? (
+                        <span className="animate-pulse">Generating Sprint...</span>
+                      ) : (
+                        <>
+                          <Zap className="w-5 h-5" />
+                          Generate First Sprint
+                        </>
+                      )}
+                    </button>
+                    {sprintPlan && (
+                      <div className="mt-6 bg-background border border-border rounded-xl p-4 text-left overflow-y-auto max-h-[300px] custom-scrollbar">
+                        <AgentOutputCardRenderer text={sprintPlan} />
+                        <button
+                          onClick={handleSaveSprint}
+                          disabled={savingSprint}
+                          className="mt-4 w-full px-4 py-2 bg-accent/20 text-accent border border-accent/30 font-semibold rounded-lg hover:bg-accent/30 transition-colors"
+                        >
+                          {savingSprint ? 'Saving...' : 'Save Sprint'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
