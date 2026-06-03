@@ -56,6 +56,7 @@ def list_project_issues(project_id: str, state: str = "all", per_page: int = 20)
             "created_at": i.get("created_at"),
             "updated_at": i.get("updated_at"),
             "web_url": i.get("web_url"),
+            "description": i.get("description", ""),
         })
     return {"issues": result, "total": len(result)}
 
