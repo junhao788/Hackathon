@@ -865,4 +865,3 @@ def setup_gitlab_webhook(project_id: str):
             requests.post(url, headers=HEADERS, json=payload)
             
     return {"status": "success"}
-    return {"error": create_resp.text}

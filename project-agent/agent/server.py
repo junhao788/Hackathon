@@ -818,7 +818,7 @@ async def execute_auto_wiki(project_id: str, mr_iid: int, target_branch: str):
 
 
 @app.post("/api/webhooks/gitlab")
-async def gitlab_webhook(request: Request):
+async def gitlab_webhook_events(request: Request):
     payload = await request.json()
     event_type = request.headers.get("X-Gitlab-Event")
 
