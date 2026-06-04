@@ -741,15 +741,16 @@ async def execute_manual_review(project_id: str, mr_iid: int):
 async def execute_auto_triage(project_id: str, issue_iid: int, issue_data: dict):
     print(f"🤖 Starting Auto-Triage for Issue #{issue_iid}: {issue_data.get('title')}")
     
-    # 1. Read team profiles
-    team_roster = []
-    if os.path.exists(TEAM_PROFILES_PATH):
-        with open(TEAM_PROFILES_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            team_roster = data.get("team", [])
-            
+    # 1. Fetch ACTUAL project members (so we don't assign to people in other projects)
+    from agent.gitlab_api import get_project_members
+    members_resp = get_project_members(project_id)
+    if "error" in members_resp:
+        print(f"   ❌ Failed to fetch project members for auto-triage: {members_resp['error']}")
+        return
+        
+    team_roster = members_resp.get("members", [])
     if not team_roster:
-        print("   ❌ No team roster available for auto-triage.")
+        print("   ❌ No project members available for auto-triage.")
         return
 
     # 2. Prepare the prompt for the AI

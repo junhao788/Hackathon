@@ -502,6 +502,8 @@ def get_project_members(project_id: str) -> dict:
             "skills": profile.get("skills", []),
             "experience_level": profile.get("experience_level", "Unknown"),
             "availability": profile.get("availability", "Unknown"),
+            "assignable": profile.get("assignable", True),
+            "current_open_issues": profile.get("current_open_issues", 0),
         })
     
     return {"members": members, "total": len(members)}
