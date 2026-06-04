@@ -175,6 +175,7 @@ def get_pipeline_jobs(project_id: str, pipeline_id: int) -> dict:
             "web_url": j.get("web_url"),
             "started_at": j.get("started_at"),
             "finished_at": j.get("finished_at"),
+            "failure_reason": j.get("failure_reason", "unknown")
         })
     return {"jobs": result, "total": len(result)}
 

@@ -975,11 +975,12 @@ async def execute_pipeline_rescue(project_id: str, pipeline_id: int, ref: str, p
     for job in failed_jobs[:3]:  # Max 3 failed jobs to avoid token overflow
         job_id = job.get("id")
         job_name = job.get("name", "unknown")
+        failure_reason = job.get("failure_reason", "unknown")
         log_resp = get_job_log(project_id, job_id)
         if "error" not in log_resp:
-            all_logs.append(f"=== JOB: {job_name} (ID: {job_id}, Stage: {job.get('stage')}) ===\n{log_resp.get('log', '')}")
+            all_logs.append(f"=== JOB: {job_name} (ID: {job_id}, Stage: {job.get('stage')}, Reason: {failure_reason}) ===\n{log_resp.get('log', '')}")
         else:
-            all_logs.append(f"=== JOB: {job_name} (ID: {job_id}) === [LOG FETCH FAILED]")
+            all_logs.append(f"=== JOB: {job_name} (ID: {job_id}, Reason: {failure_reason}) === [LOG FETCH FAILED]")
     
     combined_logs = "\n\n".join(all_logs)
     
