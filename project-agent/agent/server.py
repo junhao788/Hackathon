@@ -646,6 +646,68 @@ async def execute_manual_review(project_id: str, mr_iid: int):
                 # Mark as auto-fixed in the review record
                 review_json["review"]["auto_fixed"] = True
                 review_json["review"]["fix_commit"] = commit_result.get("short_id")
+                
+                # ── RE-REVIEW after auto-fix ──────────────────────────
+                print(f"   🔄 Re-reviewing MR #{mr_iid} after auto-fix...")
+                import time as _time
+                _time.sleep(5)  # Wait for GitLab to register the new commit
+                
+                mr_resp2 = requests.get(f"{GITLAB_API_URL}/projects/{project_id}/merge_requests/{mr_iid}", headers=HEADERS)
+                if mr_resp2.status_code == 200:
+                    mr_data2 = mr_resp2.json()
+                    changes_data2 = get_merge_request_changes(project_id, mr_iid)
+                    review_result2 = run_tech_lead_review(project_id, mr_data2, changes_data2)
+                    
+                    json_match2 = re.search(r'\{[\s\S]*\}', review_result2)
+                    if json_match2:
+                        review_json2 = json.loads(json_match2.group(0))
+                    else:
+                        review_json2 = {"review": {"status": "ERROR"}}
+                    
+                    status2 = review_json2.get("review", {}).get("status", "UNKNOWN")
+                    summary2 = review_json2.get("review", {}).get("summary", "")
+                    
+                    # Post re-review comment
+                    recheck_comment = f"🤖 **AI Tech Lead Re-Review (Post Auto-Fix)**\n\n**Status**: {status2}\n\n**Summary**: {summary2}\n"
+                    for fb2 in review_json2.get("review", {}).get("feedback", []):
+                        recheck_comment += f"\n- **{fb2.get('file', 'File')}**: {fb2.get('comment', '')}"
+                    post_mr_comment(project_id, mr_iid, recheck_comment)
+                    
+                    # Update the review record with re-review
+                    review_json = review_json2
+                    review_json["review"]["auto_fixed"] = True
+                    review_json["review"]["fix_commit"] = commit_result.get("short_id")
+                    status = status2
+                    
+                    if status2 == "APPROVED":
+                        print(f"   ✅ Re-review APPROVED! Auto-approving and merging MR #{mr_iid}...")
+                        try:
+                            requests.post(f"{GITLAB_API_URL}/projects/{project_id}/merge_requests/{mr_iid}/approve", headers=HEADERS)
+                        except Exception:
+                            pass
+                        try:
+                            merge_resp = requests.put(
+                                f"{GITLAB_API_URL}/projects/{project_id}/merge_requests/{mr_iid}/merge",
+                                headers=HEADERS,
+                                json={"merge_commit_message": f"Auto-merged by AI Tech Lead: MR #{mr_iid}", "should_remove_source_branch": True}
+                            )
+                            if merge_resp.status_code in [200, 201]:
+                                print(f"   🎉 MR #{mr_iid} merged successfully after auto-fix!")
+                                # Auto-close related issues
+                                mr_title2 = mr_data2.get("title", "")
+                                mr_desc2 = mr_data2.get("description", "") or ""
+                                issue_refs = set(re.findall(r'#(\d+)', mr_title2 + " " + mr_desc2))
+                                for issue_iid_ref in issue_refs:
+                                    try:
+                                        requests.put(f"{GITLAB_API_URL}/projects/{project_id}/issues/{issue_iid_ref}", headers=HEADERS, json={"state_event": "close"})
+                                        requests.post(f"{GITLAB_API_URL}/projects/{project_id}/issues/{issue_iid_ref}/notes", headers=HEADERS, json={"body": f"🤖 **Auto-closed by AI Tech Lead**\n\nThis issue was automatically closed after MR !{mr_iid} was reviewed (APPROVED) and merged by the AI Tech Lead agent."})
+                                        print(f"   📋 Auto-closed Issue #{issue_iid_ref}")
+                                    except Exception:
+                                        pass
+                        except Exception as e:
+                            print(f"   Merge failed after re-review: {e}")
+                    else:
+                        print(f"   ⚠️ Re-review status: {status2}. Manual intervention needed.")
             else:
                 print(f"   ❌ Auto-fix commit failed: {commit_result.get('error')}")
                 post_mr_comment(project_id, mr_iid, f"🔧 AI attempted an auto-fix but the commit failed: `{commit_result.get('error', 'Unknown error')}`")
