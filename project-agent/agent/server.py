@@ -1009,8 +1009,17 @@ async def execute_pipeline_rescue(project_id: str, pipeline_id: int, ref: str, p
             print(f"   ❌ AI did not return valid JSON for pipeline diagnosis.")
             return
         
-        diagnosis_json = json.loads(json_match.group(0))
-        diagnosis = diagnosis_json.get("diagnosis", {})
+        try:
+            diagnosis_json = json.loads(json_match.group(0))
+        except Exception as e:
+            print(f"   ❌ Failed to parse AI JSON: {e}")
+            return
+            
+        # Handle cases where AI omits the "diagnosis" wrapper key
+        if "diagnosis" in diagnosis_json and isinstance(diagnosis_json["diagnosis"], dict):
+            diagnosis = diagnosis_json["diagnosis"]
+        else:
+            diagnosis = diagnosis_json
         
         failure_category = diagnosis.get("failure_category", "unknown")
         error_summary = diagnosis.get("error_summary", "Unknown error")
