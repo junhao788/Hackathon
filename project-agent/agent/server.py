@@ -879,6 +879,46 @@ async def execute_auto_wiki(project_id: str, mr_iid: int, target_branch: str):
         print(f"   ❌ Auto-Wiki failed: {str(e)}")
 
 
+async def auto_close_issues_on_merge(project_id: str, mr_attrs: dict):
+    """Auto-close issues referenced in MR title/description when MR is merged (manual or auto)."""
+    import re, requests as http_req
+    from agent.gitlab_api import GITLAB_API_URL, HEADERS
+    
+    title = mr_attrs.get("title", "")
+    description = mr_attrs.get("description", "") or ""
+    mr_iid = mr_attrs.get("iid", "?")
+    
+    # Find all issue references like #7, #12, #13
+    issue_refs = set(re.findall(r'#(\d+)', title + " " + description))
+    
+    if not issue_refs:
+        print(f"   ℹ️ No issue references found in MR !{mr_iid}")
+        return
+    
+    print(f"   📋 Found issue references in MR !{mr_iid}: {issue_refs}")
+    
+    for issue_iid in issue_refs:
+        try:
+            # Close the issue
+            close_resp = http_req.put(
+                f"{GITLAB_API_URL}/projects/{project_id}/issues/{issue_iid}",
+                headers=HEADERS,
+                json={"state_event": "close"}
+            )
+            if close_resp.status_code == 200:
+                print(f"   ✅ Auto-closed Issue #{issue_iid}")
+                # Post a comment explaining why
+                http_req.post(
+                    f"{GITLAB_API_URL}/projects/{project_id}/issues/{issue_iid}/notes",
+                    headers=HEADERS,
+                    json={"body": f"🤖 **Auto-closed** — This issue was resolved by MR !{mr_iid} which has been merged."}
+                )
+            else:
+                print(f"   ⚠️ Failed to close Issue #{issue_iid}: {close_resp.status_code}")
+        except Exception as e:
+            print(f"   ❌ Error closing Issue #{issue_iid}: {e}")
+
+
 @app.post("/api/webhooks/gitlab")
 async def gitlab_webhook_events(request: Request):
     payload = await request.json()
@@ -895,6 +935,8 @@ async def gitlab_webhook_events(request: Request):
             asyncio.create_task(execute_manual_review(project_id, mr_iid))
         elif action == "merge":
             asyncio.create_task(execute_auto_wiki(project_id, mr_iid, target_branch))
+            # Auto-close issues referenced in MR title/description on manual merge
+            asyncio.create_task(auto_close_issues_on_merge(project_id, attrs))
             
     elif event_type == "Issue Hook":
         attrs = payload.get("object_attributes", {})
