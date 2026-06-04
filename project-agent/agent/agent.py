@@ -442,6 +442,7 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
     - You must analyze the technical domain of the issue (e.g., Frontend, Backend, Database, DevOps).
     - Match the issue domain to the developers' skills in the Team Roster.
     - Select the best developer who matches the required skill AND has the lowest current workload (current_open_issues).
+    - CRITICAL: If there is a skill match, you MUST assign the issue to that developer EVEN IF their workload is extremely high. Do NOT leave it unassigned (None) if there is at least one assignable developer with the required skills.
     - Generate appropriate labels for the issue (e.g., "frontend", "bug", "high-priority", "🤖 AI-Triaged").
     - YOU MUST RETURN A STRICT JSON OBJECT in the following format. NO markdown code blocks, NO conversational text.
     {
