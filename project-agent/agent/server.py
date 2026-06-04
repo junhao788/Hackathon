@@ -764,14 +764,27 @@ async def execute_auto_triage(project_id: str, issue_iid: int, issue_data: dict)
     # 3. Call the AI
     chat_req = ChatRequest(message=prompt, project_id=project_id)
     try:
-        result = await chat(chat_req)
+        response_obj = await chat(chat_req)
+        
+        # If it returned an error dict instead of StreamingResponse
+        if isinstance(response_obj, dict):
+            ai_response = response_obj.get("response", "")
+        else:
+            # It's a StreamingResponse, we must consume it
+            chunks = []
+            async for chunk in response_obj.body_iterator:
+                chunks.append(chunk)
+            ai_response = "".join(chunks)
+
+        if '"error": "Agent is busy' in ai_response:
+            print("   ❌ Triage failed: Agent is busy.")
+            return
+
         # 4. Parse the AI result
-        ai_response = result.get("response", "")
-        # Extract JSON from response
         import re
         json_match = re.search(r'\{[\s\S]*\}', ai_response)
         if not json_match:
-            print("   ❌ AI did not return a valid JSON object.")
+            print(f"   ❌ AI did not return a valid JSON object. Raw: {ai_response}")
             return
             
         triage_json = json.loads(json_match.group(0))
