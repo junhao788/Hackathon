@@ -1092,7 +1092,9 @@ async def execute_pipeline_rescue(project_id: str, pipeline_id: int, ref: str, p
             "severity": severity,
             "affected_files": affected_files,
             "timestamp": pipeline_attrs.get("created_at", ""),
-            "project_id": project_id
+            "project_id": project_id,
+            "raw_ai_response": ai_response,
+            "raw_logs_sent": combined_logs
         }
         _pipeline_events.insert(0, event_record)
         if len(_pipeline_events) > 20:
