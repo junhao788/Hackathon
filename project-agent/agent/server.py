@@ -945,6 +945,188 @@ async def auto_close_issues_on_merge(project_id: str, mr_attrs: dict):
             print(f"   ❌ Error closing Issue #{issue_iid}: {e}")
 
 
+# ── Pipeline Rescue (CI/CD Auto-Diagnostics) ──────────────────────────
+
+# In-memory store for pipeline events (last 20)
+_pipeline_events = []
+
+async def execute_pipeline_rescue(project_id: str, pipeline_id: int, ref: str, pipeline_attrs: dict):
+    """Diagnose a failed CI/CD pipeline by fetching job logs and asking AI for root-cause analysis."""
+    print(f"🚨 Starting Pipeline Rescue for Pipeline #{pipeline_id} on branch '{ref}'")
+    
+    from agent.gitlab_api import get_pipeline_jobs, get_job_log, GITLAB_API_URL, HEADERS
+    import requests as http_req
+    
+    # 1. Get all jobs in the failed pipeline
+    jobs_resp = get_pipeline_jobs(project_id, pipeline_id)
+    if "error" in jobs_resp:
+        print(f"   ❌ Failed to fetch pipeline jobs: {jobs_resp['error']}")
+        return
+    
+    jobs = jobs_resp.get("jobs", [])
+    failed_jobs = [j for j in jobs if j.get("status") == "failed"]
+    
+    if not failed_jobs:
+        print("   ℹ️ No failed jobs found in pipeline (might have been retried).")
+        return
+    
+    # 2. Fetch logs from each failed job
+    all_logs = []
+    for job in failed_jobs[:3]:  # Max 3 failed jobs to avoid token overflow
+        job_id = job.get("id")
+        job_name = job.get("name", "unknown")
+        log_resp = get_job_log(project_id, job_id)
+        if "error" not in log_resp:
+            all_logs.append(f"=== JOB: {job_name} (ID: {job_id}, Stage: {job.get('stage')}) ===\n{log_resp.get('log', '')}")
+        else:
+            all_logs.append(f"=== JOB: {job_name} (ID: {job_id}) === [LOG FETCH FAILED]")
+    
+    combined_logs = "\n\n".join(all_logs)
+    
+    # 3. Send to AI for diagnosis
+    prompt = f"Execute PIPELINE RESCUE PROTOCOL.\n\nPipeline #{pipeline_id} on branch '{ref}' has FAILED.\n\nFailed Job Logs:\n{combined_logs}"
+    chat_req = ChatRequest(message=prompt, project_id=project_id)
+    
+    try:
+        response_obj = await chat(chat_req)
+        
+        if isinstance(response_obj, dict):
+            ai_response = response_obj.get("response", "")
+        else:
+            chunks = []
+            async for chunk in response_obj.body_iterator:
+                chunks.append(chunk)
+            ai_response = "".join(chunks)
+        
+        if '"error": "Agent is busy' in ai_response:
+            print("   ❌ Pipeline Rescue failed: Agent is busy.")
+            return
+        
+        # 4. Parse AI diagnosis
+        import re
+        json_match = re.search(r'\{[\s\S]*\}', ai_response)
+        if not json_match:
+            print(f"   ❌ AI did not return valid JSON for pipeline diagnosis.")
+            return
+        
+        diagnosis_json = json.loads(json_match.group(0))
+        diagnosis = diagnosis_json.get("diagnosis", {})
+        
+        failure_category = diagnosis.get("failure_category", "unknown")
+        error_summary = diagnosis.get("error_summary", "Unknown error")
+        root_cause = diagnosis.get("root_cause", "Could not determine root cause")
+        affected_files = diagnosis.get("affected_files", [])
+        fix_suggestion = diagnosis.get("fix_suggestion", "No suggestion available")
+        severity = diagnosis.get("severity", "medium")
+        
+        print(f"   ✅ AI Diagnosis: [{failure_category}] {error_summary}")
+        
+        # 5. Post diagnosis as a comment on the commit that triggered this pipeline
+        sha = pipeline_attrs.get("sha", "")
+        
+        severity_emoji = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(severity, "⚪")
+        
+        comment_body = (
+            f"🚨 **AI Pipeline Rescue — Automated Failure Diagnosis**\n\n"
+            f"**Pipeline**: #{pipeline_id} | **Branch**: `{ref}`\n"
+            f"**Severity**: {severity_emoji} {severity.upper()}\n"
+            f"**Category**: `{failure_category}`\n\n"
+            f"---\n\n"
+            f"### 🔍 Error Summary\n{error_summary}\n\n"
+            f"### 🧠 Root Cause Analysis\n{root_cause}\n\n"
+        )
+        
+        if affected_files:
+            comment_body += f"### 📁 Affected Files\n"
+            for f in affected_files:
+                comment_body += f"- `{f}`\n"
+            comment_body += "\n"
+        
+        comment_body += f"### 💡 Fix Suggestion\n{fix_suggestion}\n"
+        
+        # Post on the commit
+        if sha:
+            try:
+                http_req.post(
+                    f"{GITLAB_API_URL}/projects/{project_id}/repository/commits/{sha}/comments",
+                    headers=HEADERS,
+                    json={"note": comment_body}
+                )
+                print(f"   ✅ Posted diagnosis on commit {sha[:8]}")
+            except Exception as e:
+                print(f"   ❌ Failed to post commit comment: {e}")
+        
+        # Also try to find the MR that triggered this pipeline and comment there
+        try:
+            mrs_resp = http_req.get(
+                f"{GITLAB_API_URL}/projects/{project_id}/merge_requests",
+                headers=HEADERS,
+                params={"state": "opened", "source_branch": ref, "per_page": 1}
+            )
+            if mrs_resp.status_code == 200 and mrs_resp.json():
+                mr_iid = mrs_resp.json()[0].get("iid")
+                from agent.gitlab_api import post_mr_comment
+                post_mr_comment(project_id, mr_iid, comment_body)
+                print(f"   ✅ Also posted diagnosis on MR !{mr_iid}")
+        except Exception:
+            pass
+        
+        # 6. Store event for the frontend dashboard
+        event_record = {
+            "pipeline_id": pipeline_id,
+            "ref": ref,
+            "sha": sha[:8] if sha else "unknown",
+            "failure_category": failure_category,
+            "error_summary": error_summary,
+            "root_cause": root_cause,
+            "fix_suggestion": fix_suggestion,
+            "severity": severity,
+            "affected_files": affected_files,
+            "timestamp": pipeline_attrs.get("created_at", ""),
+            "project_id": project_id
+        }
+        _pipeline_events.insert(0, event_record)
+        if len(_pipeline_events) > 20:
+            _pipeline_events.pop()
+        
+        print(f"   🎉 Pipeline Rescue complete for Pipeline #{pipeline_id}!")
+        
+    except Exception as e:
+        print(f"   ❌ Pipeline Rescue failed: {str(e)}")
+
+
+@app.get("/api/pipeline-events/{project_id}")
+async def get_pipeline_events(project_id: str):
+    """Get recent pipeline rescue events for the frontend dashboard."""
+    filtered = [e for e in _pipeline_events if e.get("project_id") == project_id]
+    return {"events": filtered, "total": len(filtered)}
+
+
+@app.post("/api/pipeline-rescue/{project_id}/{pipeline_id}")
+async def manual_pipeline_rescue(project_id: str, pipeline_id: int):
+    """Manually trigger pipeline rescue for a specific failed pipeline."""
+    from agent.gitlab_api import GITLAB_API_URL, HEADERS
+    import requests as http_req
+    
+    # Fetch pipeline info
+    resp = http_req.get(f"{GITLAB_API_URL}/projects/{project_id}/pipelines/{pipeline_id}", headers=HEADERS)
+    if resp.status_code != 200:
+        raise HTTPException(status_code=404, detail="Pipeline not found")
+    
+    pipe_data = resp.json()
+    ref = pipe_data.get("ref", "")
+    attrs = {
+        "id": pipeline_id,
+        "status": pipe_data.get("status"),
+        "ref": ref,
+        "sha": pipe_data.get("sha", ""),
+        "created_at": pipe_data.get("created_at", "")
+    }
+    
+    asyncio.create_task(execute_pipeline_rescue(project_id, pipeline_id, ref, attrs))
+    return {"status": "rescue_started", "pipeline_id": pipeline_id}
+
+
 @app.post("/api/webhooks/gitlab")
 async def gitlab_webhook_events(request: Request):
     payload = await request.json()
@@ -972,6 +1154,17 @@ async def gitlab_webhook_events(request: Request):
             project_id = str(payload.get("project", {}).get("id"))
             issue_iid = attrs.get("iid")
             asyncio.create_task(execute_auto_triage(project_id, issue_iid, attrs))
+
+    elif event_type == "Pipeline Hook":
+        attrs = payload.get("object_attributes", {})
+        pipeline_status = attrs.get("status")
+        pipeline_id = attrs.get("id")
+        project_id = str(payload.get("project", {}).get("id"))
+        ref = attrs.get("ref", "")
+        
+        if pipeline_status == "failed":
+            print(f"🚨 Pipeline #{pipeline_id} FAILED on branch '{ref}' — launching Pipeline Rescue!")
+            asyncio.create_task(execute_pipeline_rescue(project_id, pipeline_id, ref, attrs))
 
     return {"status": "received"}
 

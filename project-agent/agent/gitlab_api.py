@@ -157,6 +157,44 @@ def list_pipelines(project_id: str, status: str = None, per_page: int = 10) -> d
     return {"pipelines": result, "total": len(result)}
 
 
+def get_pipeline_jobs(project_id: str, pipeline_id: int) -> dict:
+    """List all jobs in a specific CI/CD pipeline, including their status and stage."""
+    url = f"{GITLAB_API_URL}/projects/{project_id}/pipelines/{pipeline_id}/jobs"
+    resp = requests.get(url, headers=HEADERS, params={"per_page": 50})
+    if resp.status_code != 200:
+        return {"error": f"GitLab API error {resp.status_code}: {resp.text[:200]}"}
+    jobs = resp.json()
+    result = []
+    for j in jobs:
+        result.append({
+            "id": j.get("id"),
+            "name": j.get("name"),
+            "stage": j.get("stage"),
+            "status": j.get("status"),
+            "duration": j.get("duration"),
+            "web_url": j.get("web_url"),
+            "started_at": j.get("started_at"),
+            "finished_at": j.get("finished_at"),
+        })
+    return {"jobs": result, "total": len(result)}
+
+
+def get_job_log(project_id: str, job_id: int) -> dict:
+    """Fetch the raw terminal output log (trace) of a specific CI/CD job.
+    Returns the last 200 lines to stay within token limits."""
+    url = f"{GITLAB_API_URL}/projects/{project_id}/jobs/{job_id}/trace"
+    resp = requests.get(url, headers=HEADERS)
+    if resp.status_code != 200:
+        return {"error": f"Failed to fetch job log: {resp.status_code}"}
+    raw_log = resp.text
+    # Trim to last 200 lines to avoid token overflow
+    lines = raw_log.strip().split("\n")
+    if len(lines) > 200:
+        trimmed = "\n".join(lines[-200:])
+        return {"log": f"...(truncated {len(lines) - 200} lines)...\n{trimmed}", "total_lines": len(lines)}
+    return {"log": raw_log, "total_lines": len(lines)}
+
+
 def get_project_info(project_id: str) -> dict:
     """
     Get general project information including statistics.
@@ -864,6 +902,7 @@ def setup_gitlab_webhook(project_id: str):
                 "url": w_url,
                 "issues_events": True,
                 "merge_requests_events": True,
+                "pipeline_events": True,
                 "push_events": False,
                 "enable_ssl_verification": False
             }

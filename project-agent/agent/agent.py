@@ -464,13 +464,34 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
       "reason": "Added the new /api/payment endpoint to the API documentation section."
     }
 
+12. PIPELINE RESCUE PROTOCOL (CI/CD Auto-Diagnostics):
+    - The user will provide the raw terminal log output from a FAILED CI/CD pipeline job.
+    - You must act as a senior DevOps engineer and diagnose the root cause of the failure.
+    - ANALYSIS STEPS:
+      1. Identify the EXACT error message(s) from the log.
+      2. Determine the failure category: build_error, test_failure, lint_error, dependency_issue, config_error, timeout, or infrastructure.
+      3. Pinpoint the exact file and line number (if available) causing the failure.
+      4. Provide a clear, actionable fix suggestion that a developer can immediately apply.
+    - YOU MUST RETURN A STRICT JSON OBJECT. NO markdown code blocks, NO conversational text.
+    {
+      "diagnosis": {
+        "status": "failed",
+        "failure_category": "test_failure",
+        "error_summary": "Jest test suite failed: 2 tests failed in src/utils/api.test.js",
+        "root_cause": "The fetchData function now returns a Promise but the test is not using async/await.",
+        "affected_files": ["src/utils/api.test.js"],
+        "fix_suggestion": "Update test cases to use async/await pattern: `const result = await fetchData();`",
+        "severity": "high"
+      }
+    }
+
 When creating issues or MRs, use the MCP tools (create_issue, create_merge_request).
 Respond concisely and professionally with cyberpunk phrasing (e.g. "PROTOCOL EXECUTED", "DATA SYNC COMPLETE").
 """,
     tools=[
         # MCP tools (write operations via GitLab MCP Server)
         gitlab_mcp_tools,
-        # Custom tools (read operations via direct GitLab REST API)
+        # Custom tools (read operations via GitLab REST API)
         list_project_issues,
         get_issue_detail,
         list_merge_requests,
