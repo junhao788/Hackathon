@@ -379,6 +379,11 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
                            </span>
                         </div>
                       )}
+                      
+                      {/* Expand Icon */}
+                      <div className="shrink-0 pl-3 ml-2 flex items-center justify-center">
+                        <ChevronDown className={`w-4 h-4 text-text-tertiary transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+                      </div>
                     </div>
                     {isExpanded && card.description && (
                       <div className="pl-10 pr-4 pb-3 pt-1">
@@ -2128,6 +2133,11 @@ export default function Dashboard() {
                                               <span className="text-xs font-mono text-accent/80 font-bold shrink-0">#{issue.iid}</span>
                                               <span className={`text-xs transition-colors truncate ${issue.state === 'closed' ? 'text-text-tertiary line-through' : 'text-text-secondary group-hover:text-text-primary'}`}>{issue.title}</span>
                                             </div>
+                                          </div>
+                                          
+                                          {/* Expand Icon */}
+                                          <div className="shrink-0 pl-3 ml-2 flex items-center justify-center">
+                                            <ChevronDown className={`w-4 h-4 text-text-tertiary transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                                           </div>
                                         </div>
                                         {isExpanded && issue.description && (
