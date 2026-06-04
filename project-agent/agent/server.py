@@ -845,8 +845,20 @@ async def execute_auto_wiki(project_id: str, mr_iid: int, target_branch: str):
     prompt = f"Execute AUTO-WIKI PROTOCOL.\n\nCURRENT README.md:\n{readme_content}\n\nMR CHANGES:\n{diff_summary}"
     chat_req = ChatRequest(message=prompt, project_id=project_id)
     try:
-        result = await chat(chat_req)
-        ai_response = result.get("response", "")
+        response_obj = await chat(chat_req)
+        
+        if isinstance(response_obj, dict):
+            ai_response = response_obj.get("response", "")
+        else:
+            chunks = []
+            async for chunk in response_obj.body_iterator:
+                chunks.append(chunk)
+            ai_response = "".join(chunks)
+
+        if '"error": "Agent is busy' in ai_response:
+            print("   ❌ Auto-Wiki failed: Agent is busy.")
+            return
+
         import re
         json_match = re.search(r'\{[\s\S]*\}', ai_response)
         if not json_match:
