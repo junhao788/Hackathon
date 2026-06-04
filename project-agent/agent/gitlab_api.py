@@ -810,6 +810,9 @@ def create_release(project_id: str, tag_name: str, name: str, description: str) 
 @ttl_cache(ttl_seconds=300)
 def get_user_by_username(username: str) -> int:
     """Find a GitLab user ID by their username."""
+    if not username or username.lower() == "none":
+        return None
+        
     url = f"{GITLAB_API_URL}/users"
     resp = requests.get(url, headers=HEADERS, params={"username": username})
     if resp.status_code == 200:
