@@ -1334,8 +1334,7 @@ async def execute_auto_revert(project_id: str, incident_data: dict):
     # 1. Get latest commit
     latest_commit = get_latest_commit(project_id, "main")
     if not latest_commit:
-        print("   ❌ Could not find latest commit to revert.")
-        return
+        return "❌ Could not find latest commit to revert."
         
     commit_sha = latest_commit.get("id")
     short_sha = commit_sha[:8]
@@ -1344,20 +1343,23 @@ async def execute_auto_revert(project_id: str, incident_data: dict):
     # 2. Create Revert Branch
     branch_name = f"revert-incident-{short_sha}"
     print(f"   🌱 Creating branch {branch_name}...")
-    create_branch(project_id, branch_name, "main")
+    b_res = create_branch(project_id, branch_name, "main")
+    if "error" in b_res:
+        return f"❌ Branch creation failed: {b_res['error']}"
     
     # 3. Execute Revert
     print(f"   ⏪ Reverting commit {short_sha}...")
     revert_res = revert_commit(project_id, commit_sha, branch_name)
     if "error" in revert_res:
-        print(f"   ❌ Revert failed: {revert_res['error']}")
-        return
+        return f"❌ Revert failed: {revert_res['error']}"
         
     # 4. Create Emergency MR
     print("   🚀 Creating Emergency Merge Request...")
     mr_title = f"🚨 [EMERGENCY] Auto-Revert: Production Incident Detected"
     mr_desc = f"**Incident Report:**\n```json\n{incident_data}\n```\n\nThis MR automatically reverts the latest commit `{short_sha}` by `{author_name}` to restore production stability.\n\n/assign @{author_name}"
     mr_res = create_merge_request(project_id, branch_name, "main", mr_title, mr_desc)
+    if "error" in mr_res:
+        return f"❌ MR creation failed: {mr_res['error']}"
     
     # 5. Create P0 Issue assigned to author
     print(f"   🐛 Creating P0 Issue for {author_name}...")
@@ -1386,14 +1388,14 @@ async def execute_auto_revert(project_id: str, incident_data: dict):
     print("   ✅ Auto-Revert Protocol Completed Successfully!")
 
 @app.post("/api/webhooks/incident/{project_id}")
-async def simulate_incident(project_id: str, request: Request, background_tasks: BackgroundTasks):
+async def simulate_incident(project_id: str, request: Request):
     try:
         incident_data = await request.json()
     except Exception:
         incident_data = {"error": "Simulated Memory Leak or Crash"}
         
-    background_tasks.add_task(execute_auto_revert, project_id, incident_data)
-    return {"status": "Incident Received, Auto-Revert Triggered"}
+    res = await execute_auto_revert(project_id, incident_data)
+    return {"status": "Incident Received, Auto-Revert Executed", "details": res}
 
 @app.get("/api/incident-events/{project_id}")
 async def get_incident_events(project_id: str):
