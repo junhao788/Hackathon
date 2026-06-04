@@ -1322,3 +1322,79 @@ def gitlab_watcher_loop():
 # Start watcher on server boot
 watcher_thread = threading.Thread(target=gitlab_watcher_loop, daemon=True)
 watcher_thread.start()
+
+
+_incident_events = []
+
+async def execute_auto_revert(project_id: str, incident_data: dict):
+    from agent.gitlab_api import get_latest_commit, create_branch, revert_commit, create_merge_request, create_issue, get_project_members
+    
+    print(f"🚨 [AUTO-REVERT] Incident detected on project {project_id}! Executing emergency response...")
+    
+    # 1. Get latest commit
+    latest_commit = get_latest_commit(project_id, "main")
+    if not latest_commit:
+        print("   ❌ Could not find latest commit to revert.")
+        return
+        
+    commit_sha = latest_commit.get("id")
+    short_sha = commit_sha[:8]
+    author_name = latest_commit.get("author_name", "Unknown")
+    
+    # 2. Create Revert Branch
+    branch_name = f"revert-incident-{short_sha}"
+    print(f"   🌱 Creating branch {branch_name}...")
+    create_branch(project_id, branch_name, "main")
+    
+    # 3. Execute Revert
+    print(f"   ⏪ Reverting commit {short_sha}...")
+    revert_res = revert_commit(project_id, commit_sha, branch_name)
+    if "error" in revert_res:
+        print(f"   ❌ Revert failed: {revert_res['error']}")
+        return
+        
+    # 4. Create Emergency MR
+    print("   🚀 Creating Emergency Merge Request...")
+    mr_title = f"🚨 [EMERGENCY] Auto-Revert: Production Incident Detected"
+    mr_desc = f"**Incident Report:**\n```json\n{incident_data}\n```\n\nThis MR automatically reverts the latest commit `{short_sha}` by `{author_name}` to restore production stability.\n\n/assign @{author_name}"
+    mr_res = create_merge_request(project_id, branch_name, "main", mr_title, mr_desc)
+    
+    # 5. Create P0 Issue assigned to author
+    print(f"   🐛 Creating P0 Issue for {author_name}...")
+    members = get_project_members(project_id)
+    # Very naive matching for hackathon demo
+    assignee_id = None
+    for m in members:
+        if m.get("name") == author_name or m.get("username") == author_name:
+            assignee_id = m.get("id")
+            break
+            
+    issue_title = f"🔥 [P0] Prod Crash Caused by Commit {short_sha}"
+    issue_desc = f"Your recent commit `{short_sha}` caused a production incident. The system has automatically created a revert MR to stop the bleeding.\n\n**Incident Details:**\n```json\n{incident_data}\n```\n\nPlease investigate the root cause immediately."
+    assignees = [assignee_id] if assignee_id else None
+    create_issue(project_id, issue_title, issue_desc, "bug,critical", assignees)
+    
+    # 6. Store event
+    event = {
+        "timestamp": incident_data.get("timestamp", "Just now"),
+        "error": incident_data.get("error", "Unknown Crash"),
+        "reverted_commit": short_sha,
+        "author": author_name,
+        "mr_url": mr_res.get("web_url", "")
+    }
+    _incident_events.insert(0, event)
+    print("   ✅ Auto-Revert Protocol Completed Successfully!")
+
+@app.post("/api/webhooks/incident/{project_id}")
+async def simulate_incident(project_id: str, request: Request, background_tasks: BackgroundTasks):
+    try:
+        incident_data = await request.json()
+    except Exception:
+        incident_data = {"error": "Simulated Memory Leak or Crash"}
+        
+    background_tasks.add_task(execute_auto_revert, project_id, incident_data)
+    return {"status": "Incident Received, Auto-Revert Triggered"}
+
+@app.get("/api/incident-events/{project_id}")
+async def get_incident_events(project_id: str):
+    return {"events": _incident_events}

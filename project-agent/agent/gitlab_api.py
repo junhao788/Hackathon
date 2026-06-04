@@ -910,3 +910,54 @@ def setup_gitlab_webhook(project_id: str):
             requests.post(url, headers=HEADERS, json=payload)
             
     return {"status": "success"}
+
+
+def create_branch(project_id: str, branch_name: str, ref: str) -> dict:
+    url = f"{GITLAB_API_URL}/projects/{project_id}/repository/branches"
+    payload = {"branch": branch_name, "ref": ref}
+    resp = requests.post(url, headers=HEADERS, json=payload)
+    if resp.status_code != 201:
+        return {"error": f"Failed to create branch: {resp.status_code} - {resp.text}"}
+    return resp.json()
+
+def revert_commit(project_id: str, commit_sha: str, branch_name: str) -> dict:
+    url = f"{GITLAB_API_URL}/projects/{project_id}/repository/commits/{commit_sha}/revert"
+    payload = {"branch": branch_name}
+    resp = requests.post(url, headers=HEADERS, json=payload)
+    if resp.status_code not in [200, 201]:
+        return {"error": f"Failed to revert commit: {resp.status_code} - {resp.text}"}
+    return resp.json()
+
+def create_merge_request(project_id: str, source_branch: str, target_branch: str, title: str, description: str) -> dict:
+    url = f"{GITLAB_API_URL}/projects/{project_id}/merge_requests"
+    payload = {
+        "source_branch": source_branch,
+        "target_branch": target_branch,
+        "title": title,
+        "description": description
+    }
+    resp = requests.post(url, headers=HEADERS, json=payload)
+    if resp.status_code != 201:
+        return {"error": f"Failed to create merge request: {resp.status_code} - {resp.text}"}
+    return resp.json()
+
+def create_issue(project_id: str, title: str, description: str, labels: str = "", assignee_ids: list = None) -> dict:
+    url = f"{GITLAB_API_URL}/projects/{project_id}/issues"
+    payload = {
+        "title": title,
+        "description": description,
+        "labels": labels
+    }
+    if assignee_ids:
+        payload["assignee_ids"] = assignee_ids
+    resp = requests.post(url, headers=HEADERS, json=payload)
+    if resp.status_code != 201:
+        return {"error": f"Failed to create issue: {resp.status_code} - {resp.text}"}
+    return resp.json()
+
+def get_latest_commit(project_id: str, branch: str = "main") -> dict:
+    url = f"{GITLAB_API_URL}/projects/{project_id}/repository/commits?ref_name={branch}&per_page=1"
+    resp = requests.get(url, headers=HEADERS)
+    if resp.status_code == 200 and len(resp.json()) > 0:
+        return resp.json()[0]
+    return {}
