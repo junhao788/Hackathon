@@ -45,9 +45,9 @@ const getColumnColor = (name: string) => {
   if (!name) return { text: 'text-accent', border: 'border-accent/30', bg: 'bg-accent/10', glow: 'hover:border-accent/60' };
   const n = name.toUpperCase();
   if (n.includes('DONE') || n.includes('COMPLETED')) return { text: 'text-green-400', border: 'border-green-500/30', bg: 'bg-green-500/10', glow: 'hover:border-green-500/50' };
-  if (n.includes('PROGRESS') || n.includes('DOING') || n.includes('ACTIVE')) return { text: 'text-indigo-400', border: 'border-indigo-500/30', bg: 'bg-indigo-500/10', glow: 'hover:border-indigo-500/50' };
+  if (n.includes('PROGRESS') || n.includes('DOING') || n.includes('ACTIVE')) return { text: 'text-purple-400', border: 'border-purple-500/30', bg: 'bg-purple-500/10', glow: 'hover:border-purple-500/50' };
   if (n.includes('BLOCK') || n.includes('CRITICAL') || n.includes('P0')) return { text: 'text-red-400', border: 'border-red-500/30', bg: 'bg-red-500/10', glow: 'hover:border-red-500/50' };
-  if (n.includes('HIGH') || n.includes('P1')) return { text: 'text-blue-400', border: 'border-blue-500/30', bg: 'bg-blue-500/10', glow: 'hover:border-blue-500/50' };
+  if (n.includes('HIGH') || n.includes('P1')) return { text: 'text-violet-400', border: 'border-violet-500/30', bg: 'bg-violet-500/10', glow: 'hover:border-violet-500/50' };
   if (n.includes('BACKLOG') || n.includes('TODO')) return { text: 'text-slate-400', border: 'border-slate-500/30', bg: 'bg-slate-500/10', glow: 'hover:border-slate-500/50' };
   return { text: 'text-accent', border: 'border-accent/30', bg: 'bg-accent/10', glow: 'hover:border-accent/60' };
 };
@@ -140,14 +140,14 @@ const StandupRenderer = ({ text }: { text?: string }) => {
 
                   {/* Merge Requests */}
                   {user.merge_requests && user.merge_requests.length > 0 && (
-                    <div className="bg-indigo-500/5 rounded-xl p-4 border border-indigo-500/10">
-                      <h5 className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2 mb-3">
+                    <div className="bg-purple-500/5 rounded-xl p-4 border border-purple-500/10">
+                      <h5 className="text-[11px] font-bold text-purple-400 uppercase tracking-widest flex items-center gap-2 mb-3">
                         <GitPullRequest className="w-3.5 h-3.5" /> Merge Requests
                       </h5>
                       <ul className="space-y-2.5">
                         {user.merge_requests.map((mr: string, j: number) => (
-                          <li key={j} className="text-[13px] text-indigo-200/80 flex items-start gap-3 font-medium">
-                            <span className="text-indigo-400 mt-[5px] shrink-0 text-[10px]">●</span>
+                          <li key={j} className="text-[13px] text-purple-200/80 flex items-start gap-3 font-medium">
+                            <span className="text-purple-400 mt-[5px] shrink-0 text-[10px]">●</span>
                             <span>{mr}</span>
                           </li>
                         ))}
@@ -277,13 +277,13 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
             const used = workloads[assignee];
             const capacity = assignee === 'Unassigned' ? (used || 1) : perPersonCapacity; // Don't show fake capacity for unassigned
             const pct = Math.min((used / capacity) * 100, 100);
-            const color = pct > 90 ? 'bg-red-500' : pct > 70 ? 'bg-sky-500' : 'bg-blue-500';
+            const color = pct > 90 ? 'bg-red-500' : pct > 70 ? 'bg-fuchsia-500' : 'bg-violet-500';
             
             return (
               <div key={assignee} className="flex items-center gap-3">
                 <div className="w-24 shrink-0 flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-sky-900/40 border border-sky-500/30 flex items-center justify-center shrink-0">
-                    <span className="text-[10px] font-bold text-sky-400 uppercase">{assignee.charAt(0)}</span>
+                  <div className="w-5 h-5 rounded-full bg-fuchsia-900/40 border border-fuchsia-500/30 flex items-center justify-center shrink-0">
+                    <span className="text-[10px] font-bold text-fuchsia-400 uppercase">{assignee.charAt(0)}</span>
                   </div>
                   <span className="text-xs font-medium text-text-primary truncate">{assignee}</span>
                 </div>
@@ -316,7 +316,7 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
                 {colHours > 0 && (
                   <>
                     <span className="text-text-tertiary text-xs">•</span>
-                    <span className="text-sky-500 text-xs font-mono">{colHours}h</span>
+                    <span className="text-fuchsia-500 text-xs font-mono">{colHours}h</span>
                   </>
                 )}
               </div>
@@ -335,7 +335,7 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
                       {/* Status Icon */}
                       <div className="shrink-0 pl-1">
                         {card.checked ? (
-                           <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                           <CheckCircle2 className="w-4 h-4 text-violet-500" />
                         ) : (
                            <div className={`w-4 h-4 rounded-full border border-dashed ${colors.text.replace('text-', 'border-')} opacity-50 group-hover:opacity-100 transition-opacity`} />
                         )}
@@ -364,15 +364,21 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
                       {/* Time Estimate */}
                       {card.estimated_hours && (
                         <div className="shrink-0 flex items-center justify-end min-w-[32px] ml-2">
-                          <span className="text-xs font-mono text-sky-500/80 group-hover:text-sky-400 transition-colors">{card.estimated_hours}h</span>
+                          <span className="text-xs font-mono text-fuchsia-500/80 group-hover:text-fuchsia-400 transition-colors">{card.estimated_hours}h</span>
                         </div>
                       )}
                       
                       {/* Assignee */}
                       {card.assigned_to && (
+<<<<<<< HEAD
                         <div className="shrink-0 flex items-center gap-2 pl-3 ml-3 border-l border-white/5">
                            <div className="w-5 h-5 rounded-full bg-sky-900/40 border border-sky-500/30 flex items-center justify-center">
                               <span className="text-[10px] font-bold text-sky-400 uppercase">{card.assigned_to.charAt(0)}</span>
+=======
+                        <div className="shrink-0 flex items-center gap-2 pl-3 ml-3 border-l border-border/40">
+                           <div className="w-5 h-5 rounded-full bg-fuchsia-900/40 border border-fuchsia-500/30 flex items-center justify-center">
+                              <span className="text-[10px] font-bold text-fuchsia-400 uppercase">{card.assigned_to.charAt(0)}</span>
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                            </div>
                            <span className="text-xs text-text-secondary hidden lg:inline-block truncate max-w-[80px]">
                              {card.assigned_to}
@@ -387,7 +393,7 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
                     </div>
                     {isExpanded && card.description && (
                       <div className="pl-10 pr-4 pb-3 pt-1">
-                        <div className="border border-sky-500/50 p-3 bg-sky-950/20 text-sm text-text-secondary whitespace-pre-wrap rounded-md">
+                        <div className="border border-fuchsia-500/50 p-3 bg-fuchsia-950/20 text-sm text-text-secondary whitespace-pre-wrap rounded-md">
                           {card.description}
                         </div>
                       </div>
@@ -1172,7 +1178,7 @@ export default function Dashboard() {
         {/* Logo / Brand */}
         <div className="px-5 pt-6 pb-4 border-b border-white/5">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-indigo-500 flex items-center justify-center shadow-lg shadow-accent/20">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-purple-500 flex items-center justify-center shadow-lg shadow-accent/20">
               <BrainCircuit className="w-4.5 h-4.5 text-background" />
             </div>
             <div>
@@ -1267,7 +1273,7 @@ export default function Dashboard() {
         {/* Top Navigation & Project Selector */}
         <div className="flex justify-between items-center mb-8 relative z-30">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-accent via-indigo-400 to-indigo-400 flex items-center gap-3">
+            <h1 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-accent via-purple-400 to-purple-400 flex items-center gap-3">
               <span className="bg-accent/10 p-2 rounded-xl border border-accent/20">
                 <Rocket className="w-6 h-6 text-accent" />
               </span>
@@ -1325,7 +1331,7 @@ export default function Dashboard() {
                         className={`p-3 rounded-lg flex flex-col cursor-pointer transition-all ${isSelected ? 'bg-accent/10 border border-accent/30' : 'hover:bg-transparent border border-transparent'}`}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${p.type === 'Personal' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-indigo-500/20 text-indigo-300'}`}>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${p.type === 'Personal' ? 'bg-purple-500/20 text-purple-300' : 'bg-purple-500/20 text-purple-300'}`}>
                             {p.type}
                           </span>
                           {isSelected && <CheckCircle2 className="w-4 h-4 text-accent" />}
@@ -1384,9 +1390,13 @@ export default function Dashboard() {
                   </button>
                   <button 
                     onClick={() => setActiveTab('roster')}
+<<<<<<< HEAD
                     className="w-full py-3.5 bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 text-text-primary font-bold rounded-xl hover:border-blue-500/50 hover:bg-blue-500/10 transition-all flex items-center justify-center gap-2"
+=======
+                    className="w-full py-3.5 bg-surface border border-border text-text-primary font-bold rounded-xl hover:border-violet-500/50 hover:bg-violet-500/10 transition-all flex items-center justify-center gap-2"
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                   >
-                    <UserPlus className="w-5 h-5 text-blue-400" />
+                    <UserPlus className="w-5 h-5 text-violet-400" />
                     Setup Talent Pool First
                   </button>
                 </div>
@@ -1464,7 +1474,7 @@ export default function Dashboard() {
                           </div>
                         )}
                         {dashboardMetrics.score_breakdown.mr_penalty > 0 && (
-                          <div className="flex justify-between items-center text-blue-400">
+                          <div className="flex justify-between items-center text-violet-400">
                             <span>Open MR Bottleneck</span>
                             <span className="font-mono">-{dashboardMetrics.score_breakdown.mr_penalty}</span>
                           </div>
@@ -1483,10 +1493,14 @@ export default function Dashboard() {
                 </div>
                 {/* Metric Sub-cards */}
                 <div className="grid grid-cols-2 gap-3 mt-auto">
+<<<<<<< HEAD
                   <div className="bg-transparent rounded-xl p-4 border border-white/5 hover:border-indigo-500/30 transition-colors">
+=======
+                  <div className="bg-background rounded-xl p-4 border border-border/50 hover:border-purple-500/30 transition-colors">
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-text-secondary flex items-center gap-2 font-semibold">
-                        <GitPullRequest className="w-3.5 h-3.5 text-indigo-400" />
+                        <GitPullRequest className="w-3.5 h-3.5 text-purple-400" />
                         Open MRs
                       </span>
                     </div>
@@ -1505,14 +1519,18 @@ export default function Dashboard() {
                       {dashboardMetrics ? dashboardMetrics.blockers_count : '-'}
                     </div>
                   </div>
+<<<<<<< HEAD
                   <div className="bg-transparent rounded-xl p-4 border border-white/5 hover:border-blue-500/30 transition-colors">
+=======
+                  <div className="bg-background rounded-xl p-4 border border-border/50 hover:border-violet-500/30 transition-colors">
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-text-secondary flex items-center gap-2 font-semibold">
-                        <Activity className="w-3.5 h-3.5 text-blue-400" />
+                        <Activity className="w-3.5 h-3.5 text-violet-400" />
                         Open Issues
                       </span>
                     </div>
-                    <div className="text-2xl font-bold font-mono text-blue-100">
+                    <div className="text-2xl font-bold font-mono text-violet-100">
                       {dashboardMetrics ? dashboardMetrics.open_issues_count : '-'}
                     </div>
                   </div>
@@ -1589,8 +1607,8 @@ export default function Dashboard() {
                       <div className="bg-[#1a1a1a] border border-white/5 border-b-0 rounded-t-xl px-4 py-2.5 flex items-center justify-between">
                         <div className="flex gap-1.5">
                           <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                          <div className="w-3 h-3 rounded-full bg-sky-500/80"></div>
-                          <div className="w-3 h-3 rounded-full bg-blue-500/80"></div>
+                          <div className="w-3 h-3 rounded-full bg-fuchsia-500/80"></div>
+                          <div className="w-3 h-3 rounded-full bg-violet-500/80"></div>
                         </div>
                         <span className="text-xs font-mono text-text-tertiary">agent@cmd:~/repo/activity-log</span>
                       </div>
@@ -1600,7 +1618,7 @@ export default function Dashboard() {
                           const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')} ${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
                           
                           const isIssue = event.type === 'ISSUE';
-                          const tagColor = isIssue ? 'text-sky-400' : 'text-indigo-400';
+                          const tagColor = isIssue ? 'text-fuchsia-400' : 'text-purple-400';
                           const tagText = isIssue ? 'ISSUE' : ' MR  ';
                           const idPrefix = isIssue ? '#' : '!';
                           const actionWord = event.data.action_word;
@@ -1616,7 +1634,7 @@ export default function Dashboard() {
                               <span className="text-text-tertiary/60 shrink-0 select-none">[{dateStr}]</span>
                               <span className={`shrink-0 select-none font-bold ${tagColor}`}>[{tagText}]</span>
                               <div className="flex-1 min-w-0 flex items-center gap-2 truncate">
-                                <span className="text-blue-400 shrink-0">@{event.data.author}</span>
+                                <span className="text-violet-400 shrink-0">@{event.data.author}</span>
                                 <span className="shrink-0 text-text-tertiary select-none">{actionWord}</span>
                                 <span className={`${tagColor} font-bold shrink-0`}>{idPrefix}{event.data.iid}:</span>
                                 <span className="text-text-primary group-hover:text-white transition-colors truncate">{event.data.title}</span>
@@ -1625,8 +1643,8 @@ export default function Dashboard() {
                           );
                         })}
                         <div className="mt-4 flex items-center gap-2 px-2 animate-pulse text-text-tertiary select-none">
-                          <span className="text-blue-400">➜</span>
-                          <span className="text-indigo-400">~</span>
+                          <span className="text-violet-400">➜</span>
+                          <span className="text-purple-400">~</span>
                           <span className="w-2 h-4 bg-text-primary/70 inline-block" />
                         </div>
                       </div>
@@ -1838,7 +1856,7 @@ export default function Dashboard() {
                 <div className="flex justify-between items-center mb-6">
                   <div>
                     <h2 className="text-xl font-semibold text-text-primary flex items-center gap-3">
-                      <Code className="w-6 h-6 text-indigo-400" /> AI Tech Lead Review
+                      <Code className="w-6 h-6 text-purple-400" /> AI Tech Lead Review
                     </h2>
                     <p className="text-sm text-text-secondary">Automated code reviews triggered by AI Git Watcher. Auto-refreshes every 15s.</p>
                   </div>
@@ -1870,7 +1888,7 @@ export default function Dashboard() {
                               </div>
                               <div className="flex items-center gap-2">
                                 {rev.review?.auto_fixed && (
-                                  <span className="px-2 py-1 rounded-md text-[10px] font-bold tracking-wider border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 flex items-center gap-1">
+                                  <span className="px-2 py-1 rounded-md text-[10px] font-bold tracking-wider border border-purple-500/30 bg-purple-500/10 text-purple-400 flex items-center gap-1">
                                     <Wrench className="w-3 h-3" /> AUTO-FIXED {rev.review?.fix_commit && <span className="font-mono opacity-70">({rev.review.fix_commit})</span>}
                                   </span>
                                 )}
@@ -1908,9 +1926,9 @@ export default function Dashboard() {
             <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] min-h-[500px] flex flex-col">
                <div className="mb-6">
                  <div className="flex items-center gap-3 mb-2">
-                   <Rocket className="w-6 h-6 text-indigo-400" />
+                   <Rocket className="w-6 h-6 text-purple-400" />
                    <h2 className="text-xl font-semibold text-text-primary">Zero-to-One</h2>
-                   <span className="text-[10px] uppercase font-bold tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">Full Lifecycle</span>
+                   <span className="text-[10px] uppercase font-bold tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full">Full Lifecycle</span>
                  </div>
                  <p className="text-sm text-text-secondary mb-4">Describe a project idea. The Agent will autonomously <strong>create a repository</strong>, <strong>plan the backlog</strong>, <strong>write starter code</strong>, and <strong>open a Merge Request</strong> — all in one shot.</p>
                  
@@ -1919,14 +1937,18 @@ export default function Dashboard() {
                      value={zeroIdea}
                      onChange={(e) => setZeroIdea(e.target.value)}
                      placeholder="e.g. Build a real-time chat app with WebSocket support..."
+<<<<<<< HEAD
                      className="w-full bg-transparent border border-white/5 rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-indigo-400 text-sm resize-y min-h-[120px]"
+=======
+                     className="w-full bg-background border border-border rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-purple-400 text-sm resize-y min-h-[120px]"
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleZeroToOne(); } }}
                    />
                    <div className="flex justify-end">
                      <button 
                        onClick={handleZeroToOne}
                        disabled={loadingZero}
-                       className="px-6 py-3 bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 hover:bg-indigo-500/30 font-semibold rounded-lg transition-colors flex items-center gap-2"
+                       className="px-6 py-3 bg-purple-500/20 text-purple-300 border border-purple-500/50 hover:bg-purple-500/30 font-semibold rounded-lg transition-colors flex items-center gap-2"
                      >
                        {loadingZero ? <span className="animate-pulse">Deploying...</span> : <><Rocket className="w-4 h-4" /> Launch</>}
                      </button>
@@ -1940,7 +1962,7 @@ export default function Dashboard() {
                    <div className="space-y-3 mb-6">
                      {zeroProgress.map((step, i) => (
                        <div key={i} className="flex items-center gap-3 text-sm font-mono">
-                         <span className={i === zeroProgress.length - 1 ? 'animate-pulse text-indigo-300' : 'text-accent'}>{step}</span>
+                         <span className={i === zeroProgress.length - 1 ? 'animate-pulse text-purple-300' : 'text-accent'}>{step}</span>
                        </div>
                      ))}
                    </div>
@@ -1972,23 +1994,31 @@ export default function Dashboard() {
                      {/* Cards Grid */}
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        {/* Repo Card */}
+<<<<<<< HEAD
                        <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl p-5 hover:border-indigo-400/50 transition-colors group">
+=======
+                       <div className="bg-surface/50 border border-border rounded-xl p-5 hover:border-purple-400/50 transition-colors group">
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                          <div className="flex items-center gap-3 mb-3">
-                           <FolderGit2 className="w-5 h-5 text-indigo-400" />
+                           <FolderGit2 className="w-5 h-5 text-purple-400" />
                            <h4 className="text-sm font-bold uppercase tracking-wider text-text-secondary">Repository</h4>
                          </div>
                          <p className="text-lg font-semibold text-text-primary mb-2">{zeroResult.repo_name}</p>
                          {zeroResult.repo_url && (
-                           <a href={zeroResult.repo_url} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-300 hover:text-indigo-200 flex items-center gap-1 underline">
+                           <a href={zeroResult.repo_url} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-300 hover:text-purple-200 flex items-center gap-1 underline">
                              <ExternalLink className="w-3 h-3" /> Open in GitLab
                            </a>
                          )}
                        </div>
 
                        {/* Issues Card */}
+<<<<<<< HEAD
                        <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl p-5 hover:border-indigo-400/50 transition-colors">
+=======
+                       <div className="bg-surface/50 border border-border rounded-xl p-5 hover:border-purple-400/50 transition-colors">
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                          <div className="flex items-center gap-3 mb-3">
-                           <ListChecks className="w-5 h-5 text-indigo-400" />
+                           <ListChecks className="w-5 h-5 text-purple-400" />
                            <h4 className="text-sm font-bold uppercase tracking-wider text-text-secondary">Backlog Issues</h4>
                          </div>
                          <p className="text-3xl font-bold font-mono text-text-primary mb-2">{zeroResult.issues_created || zeroResult.issues?.length || 0}</p>
@@ -1996,13 +2026,13 @@ export default function Dashboard() {
                            <ul className="space-y-1 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
                              {zeroResult.issues.map((issue: any, i: number) => (
                                <li key={i} className="text-xs text-text-secondary flex items-center gap-2">
-                                 <span className="w-1 h-1 rounded-full bg-indigo-400"></span>
+                                 <span className="w-1 h-1 rounded-full bg-purple-400"></span>
                                  <span>#{issue.iid} {issue.title}</span>
                                  {issue.estimated_hours && (
-                                   <span className="text-sky-300 font-mono shrink-0">{issue.estimated_hours}h</span>
+                                   <span className="text-fuchsia-300 font-mono shrink-0">{issue.estimated_hours}h</span>
                                  )}
                                  {issue.assigned_to && (
-                                   <span className="text-sky-300 font-bold ml-auto shrink-0">→ @{issue.assigned_to}</span>
+                                   <span className="text-fuchsia-300 font-bold ml-auto shrink-0">→ @{issue.assigned_to}</span>
                                  )}
                                </li>
                              ))}
@@ -2043,7 +2073,7 @@ export default function Dashboard() {
                <div className="mb-6 flex items-center justify-between">
                  <div>
                    <div className="flex items-center gap-3 mb-2">
-                     <Users className="w-6 h-6 text-indigo-400" />
+                     <Users className="w-6 h-6 text-purple-400" />
                      <h2 className="text-xl font-semibold text-text-primary">Team Workload Dashboard</h2>
                    </div>
                    <p className="text-sm text-text-secondary">View detailed profiles of all team members and their current task assignments.</p>
@@ -2061,7 +2091,7 @@ export default function Dashboard() {
                  {/* Loading State */}
                  {loadingTeam && !teamResult && (
                    <div className="flex flex-col items-center justify-center h-full text-text-tertiary gap-4">
-                     <div className="w-8 h-8 border-4 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin"></div>
+                     <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-400 rounded-full animate-spin"></div>
                      <p className="animate-pulse text-sm">Agent is fetching profiles and matching issues from GitLab...</p>
                    </div>
                  )}
@@ -2086,7 +2116,7 @@ export default function Dashboard() {
                                 {/* Tier 1: Assignee Header */}
                                 <div className="flex items-center justify-between p-3 bg-[#0c0c0e]/60 backdrop-blur-xl border-b border-white/5">
                                   <div className="flex items-center gap-4">
-                                    <div className="w-8 h-8 rounded-full border border-blue-500/30 flex items-center justify-center text-xs font-bold uppercase shadow-sm bg-blue-900/40 text-blue-400 shrink-0">
+                                    <div className="w-8 h-8 rounded-full border border-violet-500/30 flex items-center justify-center text-xs font-bold uppercase shadow-sm bg-violet-900/40 text-violet-400 shrink-0">
                                       {dev.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
                                     </div>
                                     <div className="flex flex-col">
@@ -2123,7 +2153,7 @@ export default function Dashboard() {
                                             <div className="flex items-center gap-3 shrink-0">
                                               <div className="w-4 h-px bg-border/40 ml-2"></div>
                                               {issue.state === 'closed' ? (
-                                                <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 opacity-80 shrink-0" />
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-violet-500 opacity-80 shrink-0" />
                                               ) : (
                                                 <div className="w-3 h-3 rounded-full border border-dashed border-accent/50 opacity-60 group-hover:opacity-100 group-hover:border-solid transition-all bg-accent/10 shrink-0" />
                                               )}
@@ -2142,7 +2172,7 @@ export default function Dashboard() {
                                         </div>
                                         {isExpanded && issue.description && (
                                           <div className="pl-14 pr-4 pb-3 pt-0">
-                                            <div className="border border-sky-500/50 p-3 bg-sky-950/20 text-xs text-text-secondary whitespace-pre-wrap rounded-md">
+                                            <div className="border border-fuchsia-500/50 p-3 bg-fuchsia-950/20 text-xs text-text-secondary whitespace-pre-wrap rounded-md">
                                               {issue.description}
                                             </div>
                                           </div>
@@ -2152,7 +2182,7 @@ export default function Dashboard() {
                                   ) : (
                                     <div className="flex items-center gap-3 px-4 py-3 text-text-tertiary text-xs italic bg-[#0c0c0e]/60 backdrop-blur-xl">
                                       <div className="w-4 h-px bg-border/40 ml-2 shrink-0"></div>
-                                      <CheckCircle2 className="w-3.5 h-3.5 opacity-50 shrink-0 text-blue-400" /> No active tasks assigned. Available for work!
+                                      <CheckCircle2 className="w-3.5 h-3.5 opacity-50 shrink-0 text-violet-400" /> No active tasks assigned. Available for work!
                                     </div>
                                   )}
                                 </div>
@@ -2274,7 +2304,7 @@ export default function Dashboard() {
                 {/* Release Notes Content */}
                 {loadingRelease && !releaseReport ? (
                   <div className="flex flex-col items-center justify-center py-20 text-text-tertiary">
-                    <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-400 rounded-full animate-spin mb-4" />
+                    <div className="w-12 h-12 border-4 border-violet-500/30 border-t-violet-400 rounded-full animate-spin mb-4" />
                     <p className="text-sm animate-pulse">AI is analyzing merged MRs and closed issues...</p>
                   </div>
                 ) : releaseReport ? (() => {
@@ -2343,7 +2373,7 @@ export default function Dashboard() {
                       {/* Categories (Vertical Document Flow) */}
                       <div className="space-y-8">
                         {[
-                          { key: 'features', label: 'New Features', icon: Sparkles, color: 'text-blue-400', items: categories.features || [] },
+                          { key: 'features', label: 'New Features', icon: Sparkles, color: 'text-violet-400', items: categories.features || [] },
                           { key: 'bugfixes', label: 'Bug Fixes', icon: AlertCircle, color: 'text-red-400', items: categories.bugfixes || [] },
                           { key: 'performance', label: 'Performance', icon: Zap, color: 'text-yellow-400', items: categories.performance || [] },
                           { key: 'maintenance', label: 'Maintenance', icon: Wrench, color: 'text-slate-400', items: categories.maintenance || [] },
@@ -2442,8 +2472,8 @@ export default function Dashboard() {
                 <div className="flex justify-between items-center">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="bg-gradient-to-br from-blue-500/20 to-sky-500/20 p-2.5 rounded-xl border border-blue-500/20">
-                        <Briefcase className="w-6 h-6 text-blue-400" />
+                      <div className="bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 p-2.5 rounded-xl border border-violet-500/20">
+                        <Briefcase className="w-6 h-6 text-violet-400" />
                       </div>
                       <h2 className="text-xl font-semibold text-text-primary">Company Talent Pool</h2>
                     </div>
@@ -2461,7 +2491,7 @@ export default function Dashboard() {
                     className={`px-5 py-2.5 font-semibold rounded-xl transition-all flex items-center gap-2 text-sm ${
                       showAddForm 
                         ? 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20' 
-                        : 'bg-gradient-to-r from-blue-500 to-sky-500 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-[1.02]'
+                        : 'bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 hover:scale-[1.02]'
                     }`}
                   >
                     {showAddForm ? <><AlertCircle className="w-4 h-4" /> Cancel</> : <><Plus className="w-4 h-4" /> Add Member</>}
@@ -2470,8 +2500,13 @@ export default function Dashboard() {
 
                 {/* Add Member Form (Expandable) */}
                 {showAddForm && (
+<<<<<<< HEAD
                   <div className="mt-6 bg-transparent/80 border border-blue-500/20 rounded-2xl p-6 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300">
                     <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+=======
+                  <div className="mt-6 bg-background/80 border border-violet-500/20 rounded-2xl p-6 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300">
+                    <h3 className="text-sm font-bold text-violet-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                       {editingUsername ? <><Pencil className="w-4 h-4" /> Edit Team Member</> : <><UserPlus className="w-4 h-4" /> New Team Member</>}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2482,32 +2517,44 @@ export default function Dashboard() {
                           value={newMember.name}
                           onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
                           placeholder="e.g. John Doe"
+<<<<<<< HEAD
                           className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary"
+=======
+                          className="w-full bg-surface border border-border rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all placeholder:text-text-tertiary"
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                         />
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wider">GitLab Username *</label>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400 font-mono text-sm">@</span>
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-400 font-mono text-sm">@</span>
                           <input
                             type="text"
                             value={newMember.username}
                             onChange={(e) => setNewMember({ ...newMember, username: e.target.value })}
                             placeholder="gitlab_username"
+<<<<<<< HEAD
                             className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg pl-8 pr-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary font-mono"
+=======
+                            className="w-full bg-surface border border-border rounded-lg pl-8 pr-4 py-2.5 text-text-primary focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all placeholder:text-text-tertiary font-mono"
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                           />
                         </div>
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wider">GitHub Username (Auto-Skills)</label>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-400 font-mono text-sm">@</span>
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-fuchsia-400 font-mono text-sm">@</span>
                           <input
                             type="text"
                             value={newMember.github_username}
                             onChange={(e) => setNewMember({ ...newMember, github_username: e.target.value })}
                             placeholder="github_username"
+<<<<<<< HEAD
                             className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg pl-8 pr-4 py-2.5 text-text-primary focus:outline-none focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/20 transition-all placeholder:text-text-tertiary font-mono"
+=======
+                            className="w-full bg-surface border border-border rounded-lg pl-8 pr-4 py-2.5 text-text-primary focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/20 transition-all placeholder:text-text-tertiary font-mono"
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                           />
                         </div>
                       </div>
@@ -2518,7 +2565,11 @@ export default function Dashboard() {
                           value={newMember.role}
                           onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
                           placeholder="e.g. Senior Frontend Engineer"
+<<<<<<< HEAD
                           className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary"
+=======
+                          className="w-full bg-surface border border-border rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all placeholder:text-text-tertiary"
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                         />
                       </div>
                       <div>
@@ -2529,13 +2580,17 @@ export default function Dashboard() {
                             value={newMember.skills}
                             onChange={(e) => setNewMember({ ...newMember, skills: e.target.value })}
                             placeholder="React, Python, Docker, AWS"
+<<<<<<< HEAD
                             className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg pl-4 pr-24 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary"
+=======
+                            className="w-full bg-surface border border-border rounded-lg pl-4 pr-24 py-2.5 text-text-primary focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all placeholder:text-text-tertiary"
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                           />
                           <button
                             type="button"
                             onClick={handleAutoDetectSkills}
                             disabled={isDetectingSkills || (!newMember.username && !newMember.github_username)}
-                            className="absolute right-2 text-[10px] bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 border border-sky-500/30 px-2 py-1 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                            className="absolute right-2 text-[10px] bg-fuchsia-500/10 text-fuchsia-400 hover:bg-fuchsia-500/20 border border-fuchsia-500/30 px-2 py-1 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                           >
                             {isDetectingSkills ? <span className="animate-spin">⏳</span> : '✨ Detect'}
                           </button>
@@ -2546,7 +2601,11 @@ export default function Dashboard() {
                         <select
                           value={newMember.experience_level}
                           onChange={(e) => setNewMember({ ...newMember, experience_level: e.target.value })}
+<<<<<<< HEAD
                           className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer"
+=======
+                          className="w-full bg-surface border border-border rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                         >
                           <option value="Junior">Junior</option>
                           <option value="Mid">Mid-Level</option>
@@ -2567,7 +2626,7 @@ export default function Dashboard() {
                     <button
                       onClick={handleAddMember}
                       disabled={addingMember || !newMember.name.trim() || !newMember.username.trim()}
-                      className="mt-5 px-6 py-2.5 bg-gradient-to-r from-blue-500 to-sky-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-blue-500/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                      className="mt-5 px-6 py-2.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-violet-500/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                       {addingMember ? (
                         <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
@@ -2585,20 +2644,28 @@ export default function Dashboard() {
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-text-tertiary uppercase tracking-wider font-semibold">Total:</span>
+<<<<<<< HEAD
                       <span className="text-sm font-bold font-mono text-blue-400">{rosterMembers.length}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-text-tertiary uppercase tracking-wider font-semibold">Available:</span>
                       <span className="text-sm font-bold font-mono text-sky-400">{rosterMembers.filter((m: any) => m.availability === 'High').length}</span>
+=======
+                      <span className="text-sm font-bold font-mono text-violet-400">{rosterMembers.length}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-text-tertiary uppercase tracking-wider font-semibold">Available:</span>
+                      <span className="text-sm font-bold font-mono text-fuchsia-400">{rosterMembers.filter((m: any) => m.availability === 'High').length}</span>
+>>>>>>> parent of b69ec47 (style(ui): apply Datadog-style premium blue glassmorphism aesthetic)
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-text-tertiary uppercase tracking-wider font-semibold">Seniors:</span>
-                      <span className="text-sm font-bold font-mono text-sky-400">{rosterMembers.filter((m: any) => m.experience_level === 'Senior' || m.experience_level === 'Lead').length}</span>
+                      <span className="text-sm font-bold font-mono text-fuchsia-400">{rosterMembers.filter((m: any) => m.experience_level === 'Senior' || m.experience_level === 'Lead').length}</span>
                     </div>
                   </div>
                   <button
                     onClick={fetchRoster}
-                    className="text-xs text-text-tertiary hover:text-blue-400 transition-colors flex items-center gap-1"
+                    className="text-xs text-text-tertiary hover:text-violet-400 transition-colors flex items-center gap-1"
                   >
                     <Activity className={`w-3 h-3 ${loadingRoster ? 'animate-spin' : ''}`} /> Refresh
                   </button>
@@ -2609,7 +2676,7 @@ export default function Dashboard() {
               {loadingRoster && rosterMembers.length === 0 ? (
                 <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] flex items-center justify-center py-20">
                   <div className="flex flex-col items-center gap-4 text-text-tertiary">
-                    <div className="w-8 h-8 border-4 border-blue-500/30 border-t-blue-400 rounded-full animate-spin" />
+                    <div className="w-8 h-8 border-4 border-violet-500/30 border-t-violet-400 rounded-full animate-spin" />
                     <p className="text-sm animate-pulse">Loading company roster...</p>
                   </div>
                 </div>
@@ -2623,10 +2690,10 @@ export default function Dashboard() {
                 <div className="flex flex-col bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl overflow-hidden shadow-sm mb-8">
                   {rosterMembers.map((dev: any, idx: number) => {
                     const avatarColor = dev.experience_level === 'Senior' || dev.experience_level === 'Lead'
-                      ? 'bg-sky-900/40 border-sky-500/30 text-sky-400'
+                      ? 'bg-fuchsia-900/40 border-fuchsia-500/30 text-fuchsia-400'
                       : dev.experience_level === 'Mid'
-                        ? 'bg-indigo-900/40 border-indigo-500/30 text-indigo-400'
-                        : 'bg-blue-900/40 border-blue-500/30 text-blue-400';
+                        ? 'bg-purple-900/40 border-purple-500/30 text-purple-400'
+                        : 'bg-violet-900/40 border-violet-500/30 text-violet-400';
                     
                     return (
                       <div key={dev.username} className={`group flex items-center gap-4 p-3 border-b border-white/5 last:border-b-0 hover:bg-[#0c0c0e]/60 backdrop-blur-xl transition-colors`}>
@@ -2657,7 +2724,7 @@ export default function Dashboard() {
                         {/* Skills */}
                         <div className="flex-1 flex flex-wrap gap-1.5 hidden lg:flex min-w-0">
                           {(dev.skills || []).map((skill: string, sIdx: number) => (
-                            <span key={sIdx} className="text-[10px] bg-blue-500/10 border border-blue-500/30 text-blue-300 px-1.5 py-0.5 rounded cursor-default whitespace-nowrap">
+                            <span key={sIdx} className="text-[10px] bg-violet-500/10 border border-violet-500/30 text-violet-300 px-1.5 py-0.5 rounded cursor-default whitespace-nowrap">
                               {skill}
                             </span>
                           ))}
@@ -2667,7 +2734,7 @@ export default function Dashboard() {
                         <div className="shrink-0 flex items-center gap-1 pl-3 pr-2 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
                           <button
                             onClick={() => handleEditClick(dev)}
-                            className="p-1.5 rounded hover:bg-blue-500/20 text-text-tertiary hover:text-blue-400 transition-colors"
+                            className="p-1.5 rounded hover:bg-violet-500/20 text-text-tertiary hover:text-violet-400 transition-colors"
                             title={`Edit @${dev.username}`}
                           >
                             <Pencil className="w-3.5 h-3.5" />

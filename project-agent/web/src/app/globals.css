@@ -9,12 +9,7 @@
 
 body {
   color: var(--foreground);
-  background-color: var(--background);
-  /* Deep Space Radial Glows in the background */
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(14, 165, 233, 0.08), transparent 25%);
-  background-attachment: fixed;
+  background: var(--background);
   font-family: 'Inter', sans-serif;
 }
 
@@ -34,11 +29,11 @@ body {
   background: #52525b;
 }
 
-/* Datadog style Glassmorphism Card base */
+/* Card base styles to match the reference */
 .dashboard-card {
-  @apply bg-[#0c0c0e]/80 border border-white/5 backdrop-blur-xl rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)];
+  @apply bg-surface border border-border rounded-2xl p-6 relative overflow-hidden;
 }
 
 .dashboard-card-title {
-  @apply text-lg font-semibold text-white/90 tracking-wide mb-4;
+  @apply text-lg font-semibold text-text-primary mb-4;
 }
