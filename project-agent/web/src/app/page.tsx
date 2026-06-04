@@ -81,7 +81,7 @@ const StandupRenderer = ({ text }: { text?: string }) => {
   }
 
   if (!reportData) {
-    return <div className="text-sm font-mono text-text-secondary whitespace-pre-wrap bg-surface border border-border p-5 rounded-xl">{text}</div>;
+    return <div className="text-sm font-mono text-text-secondary whitespace-pre-wrap bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 p-5 rounded-xl">{text}</div>;
   }
 
   // Handle fallback if LLM returned old data
@@ -90,7 +90,7 @@ const StandupRenderer = ({ text }: { text?: string }) => {
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto pb-10">
       {/* Activity Summary */}
-      <div className="border-b border-border/60 pb-5 mb-2">
+      <div className="border-b border-white/5 pb-5 mb-2">
         <h3 className="text-[11px] font-bold text-accent uppercase tracking-widest flex items-center gap-2 mb-3">
           <Activity className="w-3.5 h-3.5" /> Daily Activity Summary
         </h3>
@@ -107,7 +107,7 @@ const StandupRenderer = ({ text }: { text?: string }) => {
               
               {/* Avatar Column */}
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-primary font-bold text-sm shrink-0 z-10">
+                <div className="w-10 h-10 rounded-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 flex items-center justify-center text-text-primary font-bold text-sm shrink-0 z-10">
                   {user.name ? user.name.charAt(0).toUpperCase() : '?'}
                 </div>
                 {i !== activityList.length - 1 && (
@@ -123,7 +123,7 @@ const StandupRenderer = ({ text }: { text?: string }) => {
                   
                   {/* Commits */}
                   {user.commits && user.commits.length > 0 && (
-                    <div className="bg-surface/30 rounded-xl p-4 border border-border/50">
+                    <div className="bg-[#0c0c0e]/60 backdrop-blur-xl rounded-xl p-4 border border-white/5">
                       <h5 className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest flex items-center gap-2 mb-3">
                         <Code className="w-3.5 h-3.5" /> Commits
                       </h5>
@@ -173,7 +173,7 @@ const StandupRenderer = ({ text }: { text?: string }) => {
                   )}
 
                   {(!user.commits?.length && !user.merge_requests?.length && !user.closed_issues?.length) && (
-                    <div className="text-[13px] text-text-tertiary italic p-3 border border-dashed border-border/50 rounded-lg">
+                    <div className="text-[13px] text-text-tertiary italic p-3 border border-dashed border-white/5 rounded-lg">
                       No tracked git activity today.
                     </div>
                   )}
@@ -186,7 +186,7 @@ const StandupRenderer = ({ text }: { text?: string }) => {
       </div>
       
       {remainingText && (
-        <div className="mt-4 p-4 bg-surface/30 border border-border/50 rounded-xl font-mono text-sm whitespace-pre-wrap text-text-secondary overflow-y-auto custom-scrollbar flex-1">
+        <div className="mt-4 p-4 bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl font-mono text-sm whitespace-pre-wrap text-text-secondary overflow-y-auto custom-scrollbar flex-1">
           {remainingText}
         </div>
       )}
@@ -271,7 +271,7 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
     <div className="flex flex-col gap-6 w-full h-full pb-4">
       {/* Individual Capacity Headers */}
       {assigneeKeys.length > 0 && (
-        <div className="flex flex-col gap-2 shrink-0 bg-surface/20 border border-border/30 rounded-xl p-3">
+        <div className="flex flex-col gap-2 shrink-0 bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl p-3">
           <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">Active Workload</div>
           {assigneeKeys.map(assignee => {
             const used = workloads[assignee];
@@ -287,7 +287,7 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
                   </div>
                   <span className="text-xs font-medium text-text-primary truncate">{assignee}</span>
                 </div>
-                <div className="flex-1 h-2 bg-surface/60 rounded-full border border-border/50 overflow-hidden">
+                <div className="flex-1 h-2 bg-[#0c0c0e]/60 backdrop-blur-xl rounded-full border border-white/5 overflow-hidden">
                   <div className={`h-full ${color} rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
                 </div>
                 <span className="text-xs font-mono font-bold text-text-secondary shrink-0 w-12 text-right">{used}{assignee !== 'Unassigned' ? `/${capacity}h` : 'h'}</span>
@@ -322,15 +322,15 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
               </div>
               
               {/* Linear-style List Container */}
-              <div className="flex flex-col bg-surface/20 border border-border/40 rounded-xl overflow-hidden shadow-sm">
+              <div className="flex flex-col bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl overflow-hidden shadow-sm">
                 {col.cards && col.cards.map((card: any, cardIdx: number) => {
                   const cardId = `sprint-${cIdx}-${cardIdx}`;
                   const isExpanded = expandedCards[cardId];
                   return (
-                  <div key={cardIdx} className={`flex flex-col border-b border-border/30 last:border-b-0 ${card.checked ? 'opacity-60 bg-surface/10' : ''}`}>
+                  <div key={cardIdx} className={`flex flex-col border-b border-white/5 last:border-b-0 ${card.checked ? 'opacity-60 bg-[#0c0c0e]/60 backdrop-blur-xl' : ''}`}>
                     <div 
                       onClick={() => toggleCard(cardId)}
-                      className="group flex items-center gap-3 p-3 hover:bg-surface/50 transition-colors cursor-pointer"
+                      className="group flex items-center gap-3 p-3 hover:bg-[#0c0c0e]/60 backdrop-blur-xl transition-colors cursor-pointer"
                     >
                       {/* Status Icon */}
                       <div className="shrink-0 pl-1">
@@ -354,7 +354,7 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
                           {card.badges
                             .filter((b: string) => !['high', 'medium', 'low', 'critical', 'p0', 'p1'].includes(b.toLowerCase()))
                             .map((badge: string, bIdx: number) => (
-                            <span key={bIdx} className={`text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-border/50 text-text-secondary bg-surface/40 group-hover:border-border/80 transition-colors`}>
+                            <span key={bIdx} className={`text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-white/5 text-text-secondary bg-[#0c0c0e]/60 backdrop-blur-xl group-hover:border-white/5 transition-colors`}>
                               {badge}
                             </span>
                           ))}
@@ -370,7 +370,7 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
                       
                       {/* Assignee */}
                       {card.assigned_to && (
-                        <div className="shrink-0 flex items-center gap-2 pl-3 ml-3 border-l border-border/40">
+                        <div className="shrink-0 flex items-center gap-2 pl-3 ml-3 border-l border-white/5">
                            <div className="w-5 h-5 rounded-full bg-sky-900/40 border border-sky-500/30 flex items-center justify-center">
                               <span className="text-[10px] font-bold text-sky-400 uppercase">{card.assigned_to.charAt(0)}</span>
                            </div>
@@ -397,7 +397,7 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
                 
                 {(!col.cards || col.cards.length === 0) && (
                   <div className="p-4 flex items-center gap-2 text-text-tertiary text-xs italic">
-                    <div className="w-4 h-4 rounded-full border border-dashed border-border/40 shrink-0 opacity-40 ml-1" />
+                    <div className="w-4 h-4 rounded-full border border-dashed border-white/5 shrink-0 opacity-40 ml-1" />
                     No issues in this group
                   </div>
                 )}
@@ -408,7 +408,7 @@ const AgentOutputCardRenderer = ({ text, inputBoardData }: { text?: string, inpu
       </div>
       
       {remainingText && (
-        <div className="mt-2 p-3 bg-surface/20 border border-border/40 rounded-lg font-mono text-xs whitespace-pre-wrap text-text-secondary overflow-y-auto custom-scrollbar shrink-0 max-h-32">
+        <div className="mt-2 p-3 bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg font-mono text-xs whitespace-pre-wrap text-text-secondary overflow-y-auto custom-scrollbar shrink-0 max-h-32">
           {remainingText}
         </div>
       )}
@@ -1165,12 +1165,12 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex text-text-primary font-sans p-4 gap-4">
+    <div className="min-h-screen bg-transparent flex text-text-primary font-sans p-4 gap-4">
       
       {/* Premium Sidebar */}
-      <aside className="w-56 flex flex-col bg-surface border border-border rounded-2xl shrink-0 h-[calc(100vh-32px)] sticky top-4 overflow-hidden">
+      <aside className="w-56 flex flex-col bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl shrink-0 h-[calc(100vh-32px)] sticky top-4 overflow-hidden">
         {/* Logo / Brand */}
-        <div className="px-5 pt-6 pb-4 border-b border-border/50">
+        <div className="px-5 pt-6 pb-4 border-b border-white/5">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-indigo-500 flex items-center justify-center shadow-lg shadow-accent/20">
               <BrainCircuit className="w-4.5 h-4.5 text-background" />
@@ -1253,7 +1253,7 @@ export default function Dashboard() {
         </nav>
 
         {/* Bottom Status */}
-        <div className="px-4 py-4 border-t border-border/50">
+        <div className="px-4 py-4 border-t border-white/5">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-sm shadow-green-400/50"></div>
             <span className="text-[10px] text-text-tertiary font-medium">Agent Online</span>
@@ -1262,7 +1262,7 @@ export default function Dashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 bg-background/50 relative z-10 p-6 md:p-8">
+      <main className="flex-1 flex flex-col min-w-0 bg-transparent/50 relative z-10 p-6 md:p-8">
         
         {/* Top Navigation & Project Selector */}
         <div className="flex justify-between items-center mb-8 relative z-30">
@@ -1283,7 +1283,7 @@ export default function Dashboard() {
                   setIsDropdownOpen(!isDropdownOpen);
                 }
               }}
-              className={`flex items-center gap-3 bg-surface/80 border border-border/80 p-2.5 rounded-xl backdrop-blur-md transition-all min-w-[320px] ${
+              className={`flex items-center gap-3 bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 p-2.5 rounded-xl backdrop-blur-md transition-all min-w-[320px] ${
                 activeTab === 'dashboard' 
                   ? 'cursor-pointer hover:border-accent/50 shadow-lg' 
                   : 'cursor-not-allowed opacity-70'
@@ -1308,7 +1308,7 @@ export default function Dashboard() {
 
             {/* Custom Dropdown Menu */}
             {isDropdownOpen && activeTab === 'dashboard' && projects.length > 0 && (
-              <div className="absolute top-full right-0 mt-2 w-full min-w-[360px] bg-surface/95 border border-border/80 rounded-xl shadow-2xl backdrop-blur-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute top-full right-0 mt-2 w-full min-w-[360px] bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl shadow-2xl backdrop-blur-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="p-2 flex flex-col gap-1 max-h-[300px] overflow-y-auto custom-scrollbar">
                   {projects.length === 0 && (
                     <div className="p-3 text-sm text-text-tertiary text-center">No projects found.</div>
@@ -1322,7 +1322,7 @@ export default function Dashboard() {
                           setSelectedProjectId(p.id);
                           setIsDropdownOpen(false);
                         }}
-                        className={`p-3 rounded-lg flex flex-col cursor-pointer transition-all ${isSelected ? 'bg-accent/10 border border-accent/30' : 'hover:bg-background border border-transparent'}`}
+                        className={`p-3 rounded-lg flex flex-col cursor-pointer transition-all ${isSelected ? 'bg-accent/10 border border-accent/30' : 'hover:bg-transparent border border-transparent'}`}
                       >
                         <div className="flex items-center justify-between mb-1">
                           <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${p.type === 'Personal' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-indigo-500/20 text-indigo-300'}`}>
@@ -1363,9 +1363,9 @@ export default function Dashboard() {
           {/* EMPTY STATE FOR PROJECT-DEPENDENT TABS */}
           {!loadingProjects && projects.length === 0 && ['dashboard', 'standup', 'issues', 'sprint', 'architect', 'techlead', 'releases', 'team'].includes(activeTab) && (
             <div className="flex flex-col items-center justify-center h-[70vh] animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="bg-[#18181b] border border-border/50 rounded-3xl p-10 max-w-lg text-center shadow-xl relative overflow-hidden">
+              <div className="bg-[#18181b] border border-white/5 rounded-3xl p-10 max-w-lg text-center shadow-xl relative overflow-hidden">
                 
-                <div className="w-20 h-20 mx-auto mb-6 bg-surface/80 rounded-full flex items-center justify-center border border-border shadow-sm">
+                <div className="w-20 h-20 mx-auto mb-6 bg-[#0c0c0e]/60 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/5 shadow-sm">
                   <FolderGit2 className="w-10 h-10 text-text-secondary" />
                 </div>
                 
@@ -1384,7 +1384,7 @@ export default function Dashboard() {
                   </button>
                   <button 
                     onClick={() => setActiveTab('roster')}
-                    className="w-full py-3.5 bg-surface border border-border text-text-primary font-bold rounded-xl hover:border-blue-500/50 hover:bg-blue-500/10 transition-all flex items-center justify-center gap-2"
+                    className="w-full py-3.5 bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 text-text-primary font-bold rounded-xl hover:border-blue-500/50 hover:bg-blue-500/10 transition-all flex items-center justify-center gap-2"
                   >
                     <UserPlus className="w-5 h-5 text-blue-400" />
                     Setup Talent Pool First
@@ -1398,7 +1398,7 @@ export default function Dashboard() {
           {activeTab === 'dashboard' && projects.length > 0 && (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pb-6">
               {/* Top Left: Main Metrics & Breakdown */}
-              <div className="dashboard-card flex flex-col min-h-[340px]">
+              <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] flex flex-col min-h-[340px]">
                 <div className="flex items-start justify-between mb-6">
                   <div>
                     <h2 className="text-lg font-semibold mb-1">Project Health Score</h2>
@@ -1439,13 +1439,13 @@ export default function Dashboard() {
                   </div>
                   
                   {/* Score Breakdown */}
-                  <div className="flex-1 w-full bg-surface/30 rounded-xl p-4 border border-border/50">
+                  <div className="flex-1 w-full bg-[#0c0c0e]/60 backdrop-blur-xl rounded-xl p-4 border border-white/5">
                     <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-3">Score Analysis</h3>
                     {isLoadingMetrics && !dashboardMetrics ? (
                       <div className="space-y-2">
-                        <div className="h-4 bg-surface/50 rounded w-full animate-pulse"></div>
-                        <div className="h-4 bg-surface/50 rounded w-3/4 animate-pulse"></div>
-                        <div className="h-4 bg-surface/50 rounded w-5/6 animate-pulse"></div>
+                        <div className="h-4 bg-[#0c0c0e]/60 backdrop-blur-xl rounded w-full animate-pulse"></div>
+                        <div className="h-4 bg-[#0c0c0e]/60 backdrop-blur-xl rounded w-3/4 animate-pulse"></div>
+                        <div className="h-4 bg-[#0c0c0e]/60 backdrop-blur-xl rounded w-5/6 animate-pulse"></div>
                       </div>
                     ) : dashboardMetrics?.score_breakdown ? (
                       <div className="space-y-2 text-sm">
@@ -1469,7 +1469,7 @@ export default function Dashboard() {
                             <span className="font-mono">-{dashboardMetrics.score_breakdown.mr_penalty}</span>
                           </div>
                         )}
-                        <div className="pt-2 mt-2 border-t border-border/50 flex justify-between items-center font-bold">
+                        <div className="pt-2 mt-2 border-t border-white/5 flex justify-between items-center font-bold">
                           <span className={dashboardMetrics.health_score >= 70 ? 'text-accent' : dashboardMetrics.health_score >= 50 ? 'text-yellow-400' : 'text-red-400'}>
                             {dashboardMetrics.status_text}
                           </span>
@@ -1483,7 +1483,7 @@ export default function Dashboard() {
                 </div>
                 {/* Metric Sub-cards */}
                 <div className="grid grid-cols-2 gap-3 mt-auto">
-                  <div className="bg-background rounded-xl p-4 border border-border/50 hover:border-indigo-500/30 transition-colors">
+                  <div className="bg-transparent rounded-xl p-4 border border-white/5 hover:border-indigo-500/30 transition-colors">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-text-secondary flex items-center gap-2 font-semibold">
                         <GitPullRequest className="w-3.5 h-3.5 text-indigo-400" />
@@ -1494,7 +1494,7 @@ export default function Dashboard() {
                       {dashboardMetrics ? dashboardMetrics.open_mrs_count : '-'}
                     </div>
                   </div>
-                  <div className="bg-background rounded-xl p-4 border border-border/50 hover:border-red-500/30 transition-colors">
+                  <div className="bg-transparent rounded-xl p-4 border border-white/5 hover:border-red-500/30 transition-colors">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-text-secondary flex items-center gap-2 font-semibold">
                         <AlertCircle className="w-3.5 h-3.5 text-red-400" />
@@ -1505,7 +1505,7 @@ export default function Dashboard() {
                       {dashboardMetrics ? dashboardMetrics.blockers_count : '-'}
                     </div>
                   </div>
-                  <div className="bg-background rounded-xl p-4 border border-border/50 hover:border-blue-500/30 transition-colors">
+                  <div className="bg-transparent rounded-xl p-4 border border-white/5 hover:border-blue-500/30 transition-colors">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-text-secondary flex items-center gap-2 font-semibold">
                         <Activity className="w-3.5 h-3.5 text-blue-400" />
@@ -1516,7 +1516,7 @@ export default function Dashboard() {
                       {dashboardMetrics ? dashboardMetrics.open_issues_count : '-'}
                     </div>
                   </div>
-                  <div className="bg-background rounded-xl p-4 border border-border/50 hover:border-green-500/30 transition-colors">
+                  <div className="bg-transparent rounded-xl p-4 border border-white/5 hover:border-green-500/30 transition-colors">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-text-secondary flex items-center gap-2 font-semibold">
                         <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
@@ -1531,15 +1531,15 @@ export default function Dashboard() {
               </div>
 
               {/* Top Right: Agent Terminal */}
-              <div className="dashboard-card flex flex-col p-0 overflow-hidden min-h-[340px]">
-                <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-surface/50">
+              <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] flex flex-col p-0 overflow-hidden min-h-[340px]">
+                <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-[#0c0c0e]/60 backdrop-blur-xl">
                   <h2 className="text-sm font-semibold">Agent Command Center</h2>
                   <div className="flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
                     <span className="text-[10px] text-text-secondary font-mono uppercase">Online</span>
                   </div>
                 </div>
-                <div className="flex-1 p-6 flex flex-col gap-4 overflow-y-auto bg-background/30 font-mono text-xs">
+                <div className="flex-1 p-6 flex flex-col gap-4 overflow-y-auto bg-transparent/30 font-mono text-xs">
                   {messages.map((msg, i) => (
                     <div key={i} className="flex gap-3 text-text-secondary">
                       <span className="text-accent shrink-0">{msg.role === 'user' ? 'YOU' : '>'}</span>
@@ -1547,7 +1547,7 @@ export default function Dashboard() {
                     </div>
                   ))}
                   <div className="mt-auto">
-                     <div className="bg-surface border border-border rounded-lg p-3 flex items-center gap-3">
+                     <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg p-3 flex items-center gap-3">
                        <span className="text-accent font-bold">{">"}</span>
                        <input 
                          type="text" 
@@ -1586,7 +1586,7 @@ export default function Dashboard() {
                   
                   return (
                     <div className="xl:col-span-2 flex flex-col mt-4 w-full animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-                      <div className="bg-[#1a1a1a] border border-border/60 border-b-0 rounded-t-xl px-4 py-2.5 flex items-center justify-between">
+                      <div className="bg-[#1a1a1a] border border-white/5 border-b-0 rounded-t-xl px-4 py-2.5 flex items-center justify-between">
                         <div className="flex gap-1.5">
                           <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
                           <div className="w-3 h-3 rounded-full bg-sky-500/80"></div>
@@ -1594,7 +1594,7 @@ export default function Dashboard() {
                         </div>
                         <span className="text-xs font-mono text-text-tertiary">agent@cmd:~/repo/activity-log</span>
                       </div>
-                      <div className="bg-[#0a0a0a] border border-border/60 rounded-b-xl overflow-hidden shadow-2xl p-4 font-mono text-xs flex flex-col h-[400px] overflow-y-auto custom-scrollbar">
+                      <div className="bg-[#0a0a0a] border border-white/5 rounded-b-xl overflow-hidden shadow-2xl p-4 font-mono text-xs flex flex-col h-[400px] overflow-y-auto custom-scrollbar">
                         {combinedActivity.map((event, idx) => {
                           const dateObj = new Date(event.data.activity_time);
                           const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')} ${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
@@ -1639,7 +1639,7 @@ export default function Dashboard() {
 
           {/* TAB: STANDUP */}
           {activeTab === 'standup' && projects.length > 0 && (
-            <div className="dashboard-card min-h-[500px] flex flex-col">
+            <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] min-h-[500px] flex flex-col">
                <div className="flex justify-between items-center mb-6">
                  <div>
                    <h2 className="text-xl font-semibold text-text-primary">Automated Standup</h2>
@@ -1655,7 +1655,7 @@ export default function Dashboard() {
                  </button>
                </div>
                
-               <div className="flex-1 bg-background border border-border rounded-xl p-6 overflow-y-auto custom-scrollbar">
+               <div className="flex-1 bg-transparent border border-white/5 rounded-xl p-6 overflow-y-auto custom-scrollbar">
                   {standupReport ? <StandupRenderer text={standupReport} /> : <span className="text-text-tertiary font-mono text-sm">No standup generated yet. Click the button above to execute the protocol.</span>}
                </div>
             </div>
@@ -1663,7 +1663,7 @@ export default function Dashboard() {
 
           {/* TAB: ISSUES */}
           {activeTab === 'issues' && projects.length > 0 && (
-            <div className="dashboard-card min-h-[500px] flex flex-col">
+            <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] min-h-[500px] flex flex-col">
                <div className="mb-6">
                  <h2 className="text-xl font-semibold text-text-primary mb-2">Issue Intelligence</h2>
                  <p className="text-sm text-text-secondary mb-4">Deep dive into any issue to aggregate context, blocking MRs, and related code.</p>
@@ -1674,19 +1674,19 @@ export default function Dashboard() {
                      value={issueQuery}
                      onChange={(e) => setIssueQuery(e.target.value)}
                      placeholder="Enter Issue # (e.g. #42) or keywords..."
-                     className="flex-1 bg-background border border-border rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-accent"
+                     className="flex-1 bg-transparent border border-white/5 rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-accent"
                    />
                    <button 
                      onClick={handleSearchIssue}
                      disabled={loadingIssue}
-                     className="px-6 py-2 bg-surface border border-border hover:border-accent text-text-primary font-semibold rounded-lg transition-colors"
+                     className="px-6 py-2 bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 hover:border-accent text-text-primary font-semibold rounded-lg transition-colors"
                    >
                      Analyze
                    </button>
                  </div>
                </div>
                
-               <div className="flex-1 bg-background border border-border rounded-xl p-6 overflow-y-auto font-mono text-sm whitespace-pre-wrap">
+               <div className="flex-1 bg-transparent border border-white/5 rounded-xl p-6 overflow-y-auto font-mono text-sm whitespace-pre-wrap">
                   {issueResult || <span className="text-text-tertiary">Agent context output will appear here.</span>}
                </div>
             </div>
@@ -1709,7 +1709,7 @@ export default function Dashboard() {
                   <p className="mt-8 text-text-secondary font-semibold tracking-[0.2em] animate-pulse text-xs uppercase">Loading Sprint History...</p>
                 </div>
               ) : sprintHistory.length > 0 ? (
-                <div className="dashboard-card">
+                <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
                   <h3 className="text-lg font-semibold text-text-primary mb-6 flex items-center gap-2">
                     <CalendarDays className="w-5 h-5 text-accent" />
                     Saved Sprints & Checklists
@@ -1717,8 +1717,8 @@ export default function Dashboard() {
                   </h3>
                   <div className="flex flex-col gap-6">
                     {sprintHistory.map((sprint, idx) => (
-                      <div key={idx} className="bg-surface/30 border border-border rounded-xl p-5 overflow-hidden flex flex-col shadow-sm">
-                        <div className="flex justify-between items-center mb-5 border-b border-border/50 pb-4">
+                      <div key={idx} className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl p-5 overflow-hidden flex flex-col shadow-sm">
+                        <div className="flex justify-between items-center mb-5 border-b border-white/5 pb-4">
                           <div>
                             <div className="flex items-center">
                               <h4 className="font-bold text-text-primary text-lg">Sprint {sprintHistory.length - idx}</h4>
@@ -1749,7 +1749,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               ) : (
-                <div className="dashboard-card flex flex-col items-center justify-center min-h-[400px]">
+                <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] flex flex-col items-center justify-center min-h-[400px]">
                   <div className="text-center max-w-md">
                     <CalendarDays className="w-16 h-16 text-text-tertiary opacity-20 mx-auto mb-6" />
                     <h3 className="text-xl font-bold text-text-primary mb-2">No Sprints Yet</h3>
@@ -1771,7 +1771,7 @@ export default function Dashboard() {
                       )}
                     </button>
                     {sprintPlan && (
-                      <div className="mt-6 bg-background border border-border rounded-xl p-4 text-left overflow-y-auto max-h-[300px] custom-scrollbar">
+                      <div className="mt-6 bg-transparent border border-white/5 rounded-xl p-4 text-left overflow-y-auto max-h-[300px] custom-scrollbar">
                         <AgentOutputCardRenderer text={sprintPlan} />
                         <button
                           onClick={handleSaveSprint}
@@ -1790,7 +1790,7 @@ export default function Dashboard() {
 
           {/* TAB: ARCHITECT */}
           {activeTab === 'architect' && projects.length > 0 && (
-            <div className="dashboard-card min-h-[500px] flex flex-col">
+            <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] min-h-[500px] flex flex-col">
                <div className="mb-6">
                  <div className="flex items-center gap-3 mb-2">
                    <Zap className="w-6 h-6 text-yellow-400" />
@@ -1803,7 +1803,7 @@ export default function Dashboard() {
                      value={architectIdea}
                      onChange={(e) => setArchitectIdea(e.target.value)}
                      placeholder="e.g. Add a Web3 crypto wallet login..."
-                     className="w-full bg-background border border-border rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-accent resize-y min-h-[120px]"
+                     className="w-full bg-transparent border border-white/5 rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-accent resize-y min-h-[120px]"
                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleArchitect(); } }}
                    />
                    <div className="flex justify-end">
@@ -1818,7 +1818,7 @@ export default function Dashboard() {
                  </div>
                </div>
                
-               <div className="flex-1 bg-background border border-border rounded-xl p-6 overflow-hidden flex flex-col relative">
+               <div className="flex-1 bg-transparent border border-white/5 rounded-xl p-6 overflow-hidden flex flex-col relative">
                  {architectResult ? (
                    <AgentOutputCardRenderer text={architectResult} />
                  ) : (
@@ -1834,7 +1834,7 @@ export default function Dashboard() {
                     {/* TAB: TECH LEAD */}
           {activeTab === 'techlead' && projects.length > 0 && (
             <div className="flex flex-col gap-6 h-full pb-6">
-              <div className="dashboard-card flex-1 flex flex-col">
+              <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] flex-1 flex flex-col">
                 <div className="flex justify-between items-center mb-6">
                   <div>
                     <h2 className="text-xl font-semibold text-text-primary flex items-center gap-3">
@@ -1842,12 +1842,12 @@ export default function Dashboard() {
                     </h2>
                     <p className="text-sm text-text-secondary">Automated code reviews triggered by AI Git Watcher. Auto-refreshes every 15s.</p>
                   </div>
-                  <button onClick={fetchTechReviews} className="px-4 py-2 bg-surface border border-border hover:border-accent text-text-primary text-sm font-semibold rounded-lg transition-colors flex items-center gap-2">
+                  <button onClick={fetchTechReviews} className="px-4 py-2 bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 hover:border-accent text-text-primary text-sm font-semibold rounded-lg transition-colors flex items-center gap-2">
                     <Activity className={`w-4 h-4 ${loadingReviews ? 'animate-spin text-accent' : ''}`} /> Refresh History
                   </button>
                 </div>
 
-                <div className="flex-1 bg-[#121214] border border-border/50 rounded-xl p-6 overflow-y-auto custom-scrollbar">
+                <div className="flex-1 bg-[#121214] border border-white/5 rounded-xl p-6 overflow-y-auto custom-scrollbar">
                   {techReviews.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-text-tertiary">
                       <CheckCheck className="w-12 h-12 opacity-20 mb-4" />
@@ -1862,8 +1862,8 @@ export default function Dashboard() {
                           'text-yellow-400 border-yellow-500/30 bg-yellow-500/10';
 
                         return (
-                          <div key={idx} className="bg-surface/40 border border-border/50 rounded-xl overflow-hidden shadow-sm">
-                            <div className="p-4 border-b border-border/50 flex justify-between items-start bg-surface/80">
+                          <div key={idx} className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl overflow-hidden shadow-sm">
+                            <div className="p-4 border-b border-white/5 flex justify-between items-start bg-[#0c0c0e]/60 backdrop-blur-xl">
                               <div>
                                 <h3 className="font-bold text-text-primary text-lg">MR #{rev.mr_iid}: {rev.mr_title}</h3>
                                 <p className="text-xs text-text-secondary mt-1">{new Date(rev.created_at * 1000).toLocaleString()}</p>
@@ -1885,7 +1885,7 @@ export default function Dashboard() {
                                 <div className="space-y-3">
                                   <h4 className="text-xs font-bold text-text-secondary uppercase tracking-widest">Feedback</h4>
                                   {rev.review.feedback.map((fb: any, fidx: number) => (
-                                    <div key={fidx} className="bg-[#18181b] border border-border/50 rounded-lg p-3">
+                                    <div key={fidx} className="bg-[#18181b] border border-white/5 rounded-lg p-3">
                                       <div className="text-xs font-mono text-accent mb-2">{fb.file}</div>
                                       <p className="text-sm text-text-secondary">{fb.comment}</p>
                                     </div>
@@ -1905,7 +1905,7 @@ export default function Dashboard() {
 
           {/* TAB: ZERO-TO-ONE */}
           {activeTab === 'zerotoone' && (
-            <div className="dashboard-card min-h-[500px] flex flex-col">
+            <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] min-h-[500px] flex flex-col">
                <div className="mb-6">
                  <div className="flex items-center gap-3 mb-2">
                    <Rocket className="w-6 h-6 text-indigo-400" />
@@ -1919,7 +1919,7 @@ export default function Dashboard() {
                      value={zeroIdea}
                      onChange={(e) => setZeroIdea(e.target.value)}
                      placeholder="e.g. Build a real-time chat app with WebSocket support..."
-                     className="w-full bg-background border border-border rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-indigo-400 text-sm resize-y min-h-[120px]"
+                     className="w-full bg-transparent border border-white/5 rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-indigo-400 text-sm resize-y min-h-[120px]"
                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleZeroToOne(); } }}
                    />
                    <div className="flex justify-end">
@@ -1934,7 +1934,7 @@ export default function Dashboard() {
                  </div>
                </div>
                
-               <div className="flex-1 bg-background border border-border rounded-xl p-6 overflow-y-auto custom-scrollbar">
+               <div className="flex-1 bg-transparent border border-white/5 rounded-xl p-6 overflow-y-auto custom-scrollbar">
                  {/* Progress indicators */}
                  {loadingZero && zeroProgress.length > 0 && (
                    <div className="space-y-3 mb-6">
@@ -1972,7 +1972,7 @@ export default function Dashboard() {
                      {/* Cards Grid */}
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        {/* Repo Card */}
-                       <div className="bg-surface/50 border border-border rounded-xl p-5 hover:border-indigo-400/50 transition-colors group">
+                       <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl p-5 hover:border-indigo-400/50 transition-colors group">
                          <div className="flex items-center gap-3 mb-3">
                            <FolderGit2 className="w-5 h-5 text-indigo-400" />
                            <h4 className="text-sm font-bold uppercase tracking-wider text-text-secondary">Repository</h4>
@@ -1986,7 +1986,7 @@ export default function Dashboard() {
                        </div>
 
                        {/* Issues Card */}
-                       <div className="bg-surface/50 border border-border rounded-xl p-5 hover:border-indigo-400/50 transition-colors">
+                       <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl p-5 hover:border-indigo-400/50 transition-colors">
                          <div className="flex items-center gap-3 mb-3">
                            <ListChecks className="w-5 h-5 text-indigo-400" />
                            <h4 className="text-sm font-bold uppercase tracking-wider text-text-secondary">Backlog Issues</h4>
@@ -2012,7 +2012,7 @@ export default function Dashboard() {
                      </div>
                      
                      {/* Note about pure project management */}
-                     <div className="bg-surface/50 border border-border rounded-xl p-4 text-center mt-4">
+                     <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl p-4 text-center mt-4">
                        <p className="text-xs text-text-secondary italic">✨ Pure Project Management Protocol: Repository created and all initial tasks instantly batch-assigned to the best developers.</p>
                      </div>
                    </div>
@@ -2039,7 +2039,7 @@ export default function Dashboard() {
 
           {/* TAB: TEAM WORKLOAD */}
           {activeTab === 'team' && projects.length > 0 && (
-            <div className="dashboard-card min-h-[500px] flex flex-col">
+            <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] min-h-[500px] flex flex-col">
                <div className="mb-6 flex items-center justify-between">
                  <div>
                    <div className="flex items-center gap-3 mb-2">
@@ -2057,7 +2057,7 @@ export default function Dashboard() {
                  </button>
                </div>
                
-               <div className="flex-1 bg-background border border-border rounded-xl p-6 overflow-y-auto custom-scrollbar">
+               <div className="flex-1 bg-transparent border border-white/5 rounded-xl p-6 overflow-y-auto custom-scrollbar">
                  {/* Loading State */}
                  {loadingTeam && !teamResult && (
                    <div className="flex flex-col items-center justify-center h-full text-text-tertiary gap-4">
@@ -2075,16 +2075,16 @@ export default function Dashboard() {
                           <Activity className="w-5 h-5 text-accent" /> Active in Project ({teamResult.filter((d: any) => d.in_project).length})
                         </h3>
                         {teamResult.filter((d: any) => d.in_project).length === 0 ? (
-                          <div className="bg-surface/30 border border-border/50 rounded-xl p-6 text-center text-text-tertiary text-sm">
+                          <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl p-6 text-center text-text-tertiary text-sm">
                             No team members are currently assigned to this project.
                           </div>
                         ) : (
                           <div className="flex flex-col gap-6">
                             {teamResult.filter((d: any) => d.in_project).map((dev: any, idx: number) => (
-                              <div key={idx} className="flex flex-col bg-surface/20 border border-border/40 rounded-xl overflow-hidden shadow-sm">
+                              <div key={idx} className="flex flex-col bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl overflow-hidden shadow-sm">
                                 
                                 {/* Tier 1: Assignee Header */}
-                                <div className="flex items-center justify-between p-3 bg-surface/40 border-b border-border/30">
+                                <div className="flex items-center justify-between p-3 bg-[#0c0c0e]/60 backdrop-blur-xl border-b border-white/5">
                                   <div className="flex items-center gap-4">
                                     <div className="w-8 h-8 rounded-full border border-blue-500/30 flex items-center justify-center text-xs font-bold uppercase shadow-sm bg-blue-900/40 text-blue-400 shrink-0">
                                       {dev.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
@@ -2092,7 +2092,7 @@ export default function Dashboard() {
                                     <div className="flex flex-col">
                                       <span className="text-sm font-bold text-text-primary flex items-center gap-2">
                                         {dev.name} 
-                                        <span className="text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-border/50 text-text-secondary bg-surface/40">
+                                        <span className="text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-white/5 text-text-secondary bg-[#0c0c0e]/60 backdrop-blur-xl">
                                           {dev.role}
                                         </span>
                                       </span>
@@ -2113,7 +2113,7 @@ export default function Dashboard() {
                                       const cardId = `team-${dev.username}-${iIdx}`;
                                       const isExpanded = expandedCards[cardId];
                                       return (
-                                      <div key={iIdx} className="flex flex-col border-b border-border/20 last:border-b-0 hover:bg-surface/30 transition-colors">
+                                      <div key={iIdx} className="flex flex-col border-b border-white/5 last:border-b-0 hover:bg-[#0c0c0e]/60 backdrop-blur-xl transition-colors">
                                         <div 
                                           onClick={() => toggleCard(cardId)}
                                           className="group flex items-center justify-between px-4 py-2.5 cursor-pointer"
@@ -2150,7 +2150,7 @@ export default function Dashboard() {
                                       </div>
                                     )})
                                   ) : (
-                                    <div className="flex items-center gap-3 px-4 py-3 text-text-tertiary text-xs italic bg-surface/10">
+                                    <div className="flex items-center gap-3 px-4 py-3 text-text-tertiary text-xs italic bg-[#0c0c0e]/60 backdrop-blur-xl">
                                       <div className="w-4 h-px bg-border/40 ml-2 shrink-0"></div>
                                       <CheckCircle2 className="w-3.5 h-3.5 opacity-50 shrink-0 text-blue-400" /> No active tasks assigned. Available for work!
                                     </div>
@@ -2168,15 +2168,15 @@ export default function Dashboard() {
                           <Briefcase className="w-5 h-5" /> Available Company Talent ({teamResult.filter((d: any) => d.in_project === false).length})
                         </h3>
                         {teamResult.filter((d: any) => d.in_project === false).length === 0 ? (
-                          <div className="bg-surface/30 border border-border/50 rounded-xl p-6 text-center text-text-tertiary text-sm">
+                          <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl p-6 text-center text-text-tertiary text-sm">
                             All talent from your company roster is currently active in this project.
                           </div>
                         ) : (
-                          <div className="flex flex-col bg-surface/10 border border-border/30 rounded-xl overflow-hidden shadow-sm opacity-60 hover:opacity-100 transition-all duration-300">
+                          <div className="flex flex-col bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl overflow-hidden shadow-sm opacity-60 hover:opacity-100 transition-all duration-300">
                             {teamResult.filter((d: any) => d.in_project === false).map((dev: any, idx: number) => (
-                              <div key={idx} className="group flex items-center justify-between p-3 border-b border-border/20 last:border-b-0 hover:bg-surface/30 transition-colors">
+                              <div key={idx} className="group flex items-center justify-between p-3 border-b border-white/5 last:border-b-0 hover:bg-[#0c0c0e]/60 backdrop-blur-xl transition-colors">
                                 <div className="flex items-center gap-4">
-                                  <div className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-xs font-bold uppercase shadow-sm bg-background text-text-tertiary shrink-0">
+                                  <div className="w-8 h-8 rounded-full border border-white/5 flex items-center justify-center text-xs font-bold uppercase shadow-sm bg-transparent text-text-tertiary shrink-0">
                                     {dev.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
                                   </div>
                                   <div className="flex flex-col">
@@ -2185,7 +2185,7 @@ export default function Dashboard() {
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-4">
-                                  <span className="text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-border/50 text-text-tertiary bg-surface/40">
+                                  <span className="text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-white/5 text-text-tertiary bg-[#0c0c0e]/60 backdrop-blur-xl">
                                     {dev.role}
                                   </span>
                                   <span className="text-[10px] font-mono text-text-tertiary/60 hidden md:block">
@@ -2222,8 +2222,8 @@ export default function Dashboard() {
           {/* TAB: RELEASE NOTES */}
           {activeTab === 'releases' && projects.length > 0 && (
             <div className="flex flex-col gap-6 pb-6">
-              <div className="bg-surface border border-border/50 rounded-2xl p-6 shadow-sm">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-6 border-b border-border/50">
+              <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-sm">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-6 border-b border-white/5">
                   <div>
                     <div className="flex items-center gap-3 mb-1">
                       <Package className="w-5 h-5 text-text-secondary" />
@@ -2238,7 +2238,7 @@ export default function Dashboard() {
                         type="text"
                         value={releaseVersion}
                         onChange={(e) => setReleaseVersion(e.target.value)}
-                        className="bg-background border border-border rounded-lg px-3 py-1.5 text-sm font-mono text-text-primary w-24 focus:outline-none focus:border-accent transition-colors"
+                        className="bg-transparent border border-white/5 rounded-lg px-3 py-1.5 text-sm font-mono text-text-primary w-24 focus:outline-none focus:border-accent transition-colors"
                         placeholder="v1.0.0"
                       />
                     </div>
@@ -2285,7 +2285,7 @@ export default function Dashboard() {
                   } catch {}
 
                   if (!releaseData?.release) {
-                    return <pre className="text-sm text-text-secondary whitespace-pre-wrap bg-[#121214] rounded-xl p-6 border border-border/50">{releaseReport}</pre>;
+                    return <pre className="text-sm text-text-secondary whitespace-pre-wrap bg-[#121214] rounded-xl p-6 border border-white/5">{releaseReport}</pre>;
                   }
 
                   const rel = releaseData.release;
@@ -2323,7 +2323,7 @@ export default function Dashboard() {
                   return (
                     <div className="space-y-8 max-w-4xl mx-auto">
                       {/* Release Header */}
-                      <div className="pb-6 border-b border-border/50">
+                      <div className="pb-6 border-b border-white/5">
                         <div className="flex justify-between items-start">
                           <div>
                             <div className="flex items-center gap-3 mb-3">
@@ -2349,7 +2349,7 @@ export default function Dashboard() {
                           { key: 'maintenance', label: 'Maintenance', icon: Wrench, color: 'text-slate-400', items: categories.maintenance || [] },
                         ].map(cat => cat.items.length > 0 && (
                           <div key={cat.key}>
-                            <h4 className="text-lg font-bold text-text-primary mb-4 flex items-center gap-2 pb-2 border-b border-border/30">
+                            <h4 className="text-lg font-bold text-text-primary mb-4 flex items-center gap-2 pb-2 border-b border-white/5">
                               <cat.icon className={`w-5 h-5 ${cat.color}`} /> {cat.label}
                             </h4>
                             <ul className="space-y-3">
@@ -2373,7 +2373,7 @@ export default function Dashboard() {
 
                       {/* Contributors */}
                       {rel.contributors && rel.contributors.length > 0 && (
-                        <div className="pt-6 border-t border-border/50">
+                        <div className="pt-6 border-t border-white/5">
                           <h4 className="text-sm font-bold text-text-primary mb-3 flex items-center gap-2">
                             <Users className="w-4 h-4 text-text-secondary" /> Contributors
                           </h4>
@@ -2412,7 +2412,7 @@ export default function Dashboard() {
                             setPublishingRelease(false);
                           }}
                           disabled={publishingRelease}
-                          className="px-6 py-2.5 bg-surface border border-border hover:border-accent hover:bg-accent/5 text-text-primary font-semibold rounded-lg transition-all flex items-center gap-2 text-sm disabled:opacity-50"
+                          className="px-6 py-2.5 bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 hover:border-accent hover:bg-accent/5 text-text-primary font-semibold rounded-lg transition-all flex items-center gap-2 text-sm disabled:opacity-50"
                         >
                           {publishingRelease ? (
                             <><div className="w-4 h-4 border-2 border-text-tertiary border-t-text-primary rounded-full animate-spin" /> Publishing...</>
@@ -2438,7 +2438,7 @@ export default function Dashboard() {
           {activeTab === 'roster' && (
             <div className="flex flex-col gap-6 pb-6">
               {/* Header */}
-              <div className="dashboard-card">
+              <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
                 <div className="flex justify-between items-center">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
@@ -2470,7 +2470,7 @@ export default function Dashboard() {
 
                 {/* Add Member Form (Expandable) */}
                 {showAddForm && (
-                  <div className="mt-6 bg-background/80 border border-blue-500/20 rounded-2xl p-6 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="mt-6 bg-transparent/80 border border-blue-500/20 rounded-2xl p-6 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300">
                     <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                       {editingUsername ? <><Pencil className="w-4 h-4" /> Edit Team Member</> : <><UserPlus className="w-4 h-4" /> New Team Member</>}
                     </h3>
@@ -2482,7 +2482,7 @@ export default function Dashboard() {
                           value={newMember.name}
                           onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
                           placeholder="e.g. John Doe"
-                          className="w-full bg-surface border border-border rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary"
+                          className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary"
                         />
                       </div>
                       <div>
@@ -2494,7 +2494,7 @@ export default function Dashboard() {
                             value={newMember.username}
                             onChange={(e) => setNewMember({ ...newMember, username: e.target.value })}
                             placeholder="gitlab_username"
-                            className="w-full bg-surface border border-border rounded-lg pl-8 pr-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary font-mono"
+                            className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg pl-8 pr-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary font-mono"
                           />
                         </div>
                       </div>
@@ -2507,7 +2507,7 @@ export default function Dashboard() {
                             value={newMember.github_username}
                             onChange={(e) => setNewMember({ ...newMember, github_username: e.target.value })}
                             placeholder="github_username"
-                            className="w-full bg-surface border border-border rounded-lg pl-8 pr-4 py-2.5 text-text-primary focus:outline-none focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/20 transition-all placeholder:text-text-tertiary font-mono"
+                            className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg pl-8 pr-4 py-2.5 text-text-primary focus:outline-none focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/20 transition-all placeholder:text-text-tertiary font-mono"
                           />
                         </div>
                       </div>
@@ -2518,7 +2518,7 @@ export default function Dashboard() {
                           value={newMember.role}
                           onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
                           placeholder="e.g. Senior Frontend Engineer"
-                          className="w-full bg-surface border border-border rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary"
+                          className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary"
                         />
                       </div>
                       <div>
@@ -2529,7 +2529,7 @@ export default function Dashboard() {
                             value={newMember.skills}
                             onChange={(e) => setNewMember({ ...newMember, skills: e.target.value })}
                             placeholder="React, Python, Docker, AWS"
-                            className="w-full bg-surface border border-border rounded-lg pl-4 pr-24 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary"
+                            className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg pl-4 pr-24 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-text-tertiary"
                           />
                           <button
                             type="button"
@@ -2546,7 +2546,7 @@ export default function Dashboard() {
                         <select
                           value={newMember.experience_level}
                           onChange={(e) => setNewMember({ ...newMember, experience_level: e.target.value })}
-                          className="w-full bg-surface border border-border rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer"
+                          className="w-full bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-lg px-4 py-2.5 text-text-primary focus:outline-none focus:border-blue-500/50 appearance-none cursor-pointer"
                         >
                           <option value="Junior">Junior</option>
                           <option value="Mid">Mid-Level</option>
@@ -2617,20 +2617,20 @@ export default function Dashboard() {
 
               {/* Roster Grid -> Linear List */}
               {loadingRoster && rosterMembers.length === 0 ? (
-                <div className="dashboard-card flex items-center justify-center py-20">
+                <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] flex items-center justify-center py-20">
                   <div className="flex flex-col items-center gap-4 text-text-tertiary">
                     <div className="w-8 h-8 border-4 border-blue-500/30 border-t-blue-400 rounded-full animate-spin" />
                     <p className="text-sm animate-pulse">Loading company roster...</p>
                   </div>
                 </div>
               ) : rosterMembers.length === 0 ? (
-                <div className="dashboard-card flex flex-col items-center justify-center py-20 text-text-tertiary">
+                <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] flex flex-col items-center justify-center py-20 text-text-tertiary">
                   <Users className="w-16 h-16 opacity-15 mb-4" />
                   <p className="text-lg font-medium mb-1">Talent Pool is Empty</p>
                   <p className="text-sm">Click "Add Member" above to register your first team member.</p>
                 </div>
               ) : (
-                <div className="flex flex-col bg-surface/20 border border-border/40 rounded-xl overflow-hidden shadow-sm mb-8">
+                <div className="flex flex-col bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-xl overflow-hidden shadow-sm mb-8">
                   {rosterMembers.map((dev: any, idx: number) => {
                     const avatarColor = dev.experience_level === 'Senior' || dev.experience_level === 'Lead'
                       ? 'bg-sky-900/40 border-sky-500/30 text-sky-400'
@@ -2639,7 +2639,7 @@ export default function Dashboard() {
                         : 'bg-blue-900/40 border-blue-500/30 text-blue-400';
                     
                     return (
-                      <div key={dev.username} className={`group flex items-center gap-4 p-3 border-b border-border/30 last:border-b-0 hover:bg-surface/50 transition-colors`}>
+                      <div key={dev.username} className={`group flex items-center gap-4 p-3 border-b border-white/5 last:border-b-0 hover:bg-[#0c0c0e]/60 backdrop-blur-xl transition-colors`}>
                         
                         {/* Avatar */}
                         <div className="shrink-0 pl-1">
@@ -2656,10 +2656,10 @@ export default function Dashboard() {
 
                         {/* Badges (Role & Seniority) */}
                         <div className="flex shrink-0 gap-1.5 hidden md:flex w-[180px]">
-                          <span className="text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-border/50 text-text-secondary bg-surface/40">
+                          <span className="text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-white/5 text-text-secondary bg-[#0c0c0e]/60 backdrop-blur-xl">
                             {dev.role}
                           </span>
-                          <span className="text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-border/50 text-text-secondary bg-surface/40">
+                          <span className="text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded-md border border-white/5 text-text-secondary bg-[#0c0c0e]/60 backdrop-blur-xl">
                             {dev.experience_level}
                           </span>
                         </div>
