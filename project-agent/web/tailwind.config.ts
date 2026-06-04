@@ -13,9 +13,9 @@ const config: Config = {
         surface: "#171717",
         border: "#262626",
         accent: {
-          DEFAULT: "#d9f99d", // Lime-200
-          hover: "#bef264",   // Lime-300
-          dark: "#1a2e05"
+          DEFAULT: "#a78bfa", // violet-400
+          hover: "#c4b5fd",   // violet-300
+          dark: "#2e1065"     // violet-950
         },
         text: {
           primary: "#ffffff",
