@@ -13,9 +13,9 @@ const config: Config = {
         surface: "#171717",
         border: "#262626",
         accent: {
-          DEFAULT: "#a78bfa", // violet-400
-          hover: "#c4b5fd",   // violet-300
-          dark: "#2e1065"     // violet-950
+          DEFAULT: "#3b82f6", // blue-500
+          hover: "#60a5fa",   // blue-400
+          dark: "#1e3a8a"     // blue-900
         },
         text: {
           primary: "#ffffff",
