@@ -2586,20 +2586,10 @@ export default function Dashboard() {
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-text-tertiary uppercase tracking-wider font-semibold">Total:</span>
                       <span className="text-sm font-bold font-mono text-blue-400">{rosterMembers.length}</span>
-                        <div className="flex items-end gap-0.5 ml-2 h-4 opacity-70">
-                          <div className="w-1 bg-blue-500/40 h-2 rounded-t-sm"></div>
-                          <div className="w-1 bg-blue-500/60 h-3 rounded-t-sm"></div>
-                          <div className="w-1 bg-blue-400 h-4 rounded-t-sm shadow-[0_0_5px_rgba(96,165,250,0.5)]"></div>
-                        </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-text-tertiary uppercase tracking-wider font-semibold">Available:</span>
                       <span className="text-sm font-bold font-mono text-sky-400">{rosterMembers.filter((m: any) => m.availability === 'High').length}</span>
-                        <div className="flex items-end gap-0.5 ml-2 h-4 opacity-70">
-                          <div className="w-1 bg-sky-500/40 h-1 rounded-t-sm"></div>
-                          <div className="w-1 bg-sky-500/60 h-2 rounded-t-sm"></div>
-                          <div className="w-1 bg-sky-400 h-3 rounded-t-sm shadow-[0_0_5px_rgba(56,189,248,0.5)]"></div>
-                        </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-text-tertiary uppercase tracking-wider font-semibold">Seniors:</span>
