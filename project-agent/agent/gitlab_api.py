@@ -35,6 +35,18 @@ PROJECT_ID = "82559130"
 HEADERS = {"PRIVATE-TOKEN": GITLAB_TOKEN}
 
 
+def get_global_user_open_issue_count(username: str) -> int:
+    """Get the total number of open issues assigned to a user across ALL projects."""
+    url = f"{GITLAB_API_URL}/issues"
+    params = {"state": "opened", "assignee_username": username, "per_page": 1}
+    resp = requests.get(url, headers=HEADERS, params=params)
+    if resp.status_code == 200:
+        total = resp.headers.get("X-Total")
+        if total is not None:
+            return int(total)
+        return len(resp.json())
+    return 0
+
 def list_project_issues(project_id: str, state: str = "all", per_page: int = 20) -> dict:
     """List issues for a project. State can be 'opened', 'closed', or 'all'."""
     url = f"{GITLAB_API_URL}/projects/{project_id}/issues"

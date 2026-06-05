@@ -742,16 +742,19 @@ async def execute_auto_triage(project_id: str, issue_iid: int, issue_data: dict)
     print(f"🤖 Starting Auto-Triage for Issue #{issue_iid}: {issue_data.get('title')}")
     
     # 1. Fetch ACTUAL project members (so we don't assign to people in other projects)
-    from agent.gitlab_api import get_project_members
-    members_resp = get_project_members(project_id)
-    if "error" in members_resp:
-        print(f"   ❌ Failed to fetch project members for auto-triage: {members_resp['error']}")
+    from agent.gitlab_api import get_team_profiles, get_global_user_open_issue_count
+    
+    profiles = get_team_profiles()
+    team_roster = profiles.get("team", [])
+    if not team_roster:
+        print("   ❌ No company team roster available for auto-triage.")
         return
         
-    team_roster = members_resp.get("members", [])
-    if not team_roster:
-        print("   ❌ No project members available for auto-triage.")
-        return
+    # Dynamically update workload globally across all projects
+    for member in team_roster:
+        username = member.get("username")
+        if username:
+            member["current_open_issues"] = get_global_user_open_issue_count(username)
 
     # 2. Prepare the prompt for the AI
     issue_info = {
