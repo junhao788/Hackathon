@@ -1400,3 +1400,53 @@ async def simulate_incident(project_id: str, request: Request):
 @app.get("/api/incident-events/{project_id}")
 async def get_incident_events(project_id: str):
     return {"events": _incident_events}
+
+# ── Standup History (standup_history.json) CRUD ──────────────────────────
+
+STANDUP_HISTORY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "standup_history.json")
+
+class StandupSaveRequest(BaseModel):
+    report: str  # The raw markdown/JSON string returned by the AI
+
+@app.post("/api/standups/{project_id}/save")
+async def save_standup(project_id: str, request: StandupSaveRequest):
+    """Save today's standup report. If one already exists for today, overwrite it."""
+    try:
+        from datetime import datetime, timezone, timedelta
+        today = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
+
+        data = {}
+        if os.path.exists(STANDUP_HISTORY_PATH):
+            with open(STANDUP_HISTORY_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+        if project_id not in data:
+            data[project_id] = {}
+
+        data[project_id][today] = {
+            "date": today,
+            "report": request.report,
+            "saved_at": datetime.now(timezone(timedelta(hours=8))).isoformat()
+        }
+
+        with open(STANDUP_HISTORY_PATH, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+        return {"status": "saved", "date": today}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/standups/{project_id}/history")
+async def get_standup_history(project_id: str):
+    """Get all saved standups for a project, sorted by date descending."""
+    try:
+        if not os.path.exists(STANDUP_HISTORY_PATH):
+            return {"standups": []}
+        with open(STANDUP_HISTORY_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        project_standups = data.get(project_id, {})
+        # Return as a list sorted by date descending
+        standups_list = sorted(project_standups.values(), key=lambda x: x["date"], reverse=True)
+        return {"standups": standups_list}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

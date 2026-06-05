@@ -532,6 +532,9 @@ export default function Dashboard() {
   // State for Standup Tab
   const [standupReport, setStandupReport] = useState<string | null>(null);
   const [loadingStandup, setLoadingStandup] = useState(false);
+  const [standupHistory, setStandupHistory] = useState<any[]>([]);
+  const [selectedStandupDate, setSelectedStandupDate] = useState<string | null>(null);
+  const [savingStandup, setSavingStandup] = useState(false);
 
   // State for Issue Intel Tab
   const [issueQuery, setIssueQuery] = useState('');
@@ -884,7 +887,8 @@ export default function Dashboard() {
   // Auto-fetch roster when tab is activated
   useEffect(() => {
     if (activeTab === 'roster') fetchRoster();
-  }, [activeTab]);
+    if (activeTab === 'standup') fetchStandupHistory();
+  }, [activeTab, selectedProjectId]);
 
   const sidebarIcons = [
     { id: 'dashboard', icon: LayoutGrid, title: 'Dashboard' },
@@ -925,8 +929,42 @@ export default function Dashboard() {
     }
   };
 
+  const fetchStandupHistory = async () => {
+    if (!selectedProjectId) return;
+    try {
+      const res = await fetch(`https://hackathon-030e.onrender.com/api/standups/${selectedProjectId}/history`);
+      const data = await res.json();
+      setStandupHistory(data.standups || []);
+      // Auto-load today's standup if it exists and nothing is currently displayed
+      if (!standupReport && data.standups?.length > 0) {
+        const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+        const todayEntry = data.standups.find((s: any) => s.date === today);
+        if (todayEntry) {
+          setStandupReport(todayEntry.report);
+          setSelectedStandupDate(todayEntry.date);
+        }
+      }
+    } catch (e) { console.error('Failed to fetch standup history', e); }
+  };
+
+  const saveStandup = async (report: string) => {
+    if (!selectedProjectId) return;
+    setSavingStandup(true);
+    try {
+      await fetch(`https://hackathon-030e.onrender.com/api/standups/${selectedProjectId}/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ report })
+      });
+      // Refresh the history after saving
+      await fetchStandupHistory();
+    } catch (e) { console.error('Failed to save standup', e); }
+    setSavingStandup(false);
+  };
+
   const handleGenerateStandup = async () => {
     setLoadingStandup(true);
+    setSelectedStandupDate(null);
     setStandupReport('Executing STANDUP GENERATOR protocol...');
     try {
       const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
@@ -936,6 +974,10 @@ export default function Dashboard() {
       });
       const data = await res.json();
       setStandupReport(data.response);
+      // Auto-save immediately after successful generation
+      if (data.response && !data.response.startsWith('Error')) {
+        await saveStandup(data.response);
+      }
     } catch (e) {
       setStandupReport('Error connecting to Agent.');
     }
@@ -1639,24 +1681,55 @@ export default function Dashboard() {
 
           {/* TAB: STANDUP */}
           {activeTab === 'standup' && projects.length > 0 && (
-            <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] min-h-[500px] flex flex-col">
+            <div className="dashboard-card min-h-[500px] flex flex-col">
                <div className="flex justify-between items-center mb-6">
                  <div>
                    <h2 className="text-xl font-semibold text-text-primary">Automated Standup</h2>
-                   <p className="text-sm text-text-secondary">Synthesizes recent commits and MRs into a team report.</p>
+                   <p className="text-sm text-text-secondary">Synthesizes recent commits and MRs into a team report. Auto-saves daily.</p>
                  </div>
-                 <button 
-                   onClick={handleGenerateStandup}
-                   disabled={loadingStandup}
-                   className="px-4 py-2 bg-accent text-background font-semibold rounded-lg hover:bg-accent-hover transition-colors flex items-center gap-2"
-                 >
-                   <Bot className="w-4 h-4" />
-                   Generate Report
-                 </button>
+                 <div className="flex items-center gap-2">
+                   {savingStandup && <span className="text-xs text-blue-400 animate-pulse">💾 Saving...</span>}
+                   <button 
+                     onClick={handleGenerateStandup}
+                     disabled={loadingStandup}
+                     className="px-4 py-2 bg-accent text-background font-semibold rounded-lg hover:bg-accent-hover transition-colors flex items-center gap-2"
+                   >
+                     <Bot className="w-4 h-4" />
+                     {loadingStandup ? 'Generating...' : 'Generate Report'}
+                   </button>
+                 </div>
                </div>
                
-               <div className="flex-1 bg-transparent border border-white/5 rounded-xl p-6 overflow-y-auto custom-scrollbar">
-                  {standupReport ? <StandupRenderer text={standupReport} /> : <span className="text-text-tertiary font-mono text-sm">No standup generated yet. Click the button above to execute the protocol.</span>}
+               <div className="flex flex-1 gap-4 overflow-hidden">
+                 {/* History Sidebar */}
+                 <div className="w-48 shrink-0 flex flex-col bg-background/50 border border-border rounded-xl overflow-hidden">
+                   <div className="px-3 py-2 border-b border-border">
+                     <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">History</span>
+                   </div>
+                   <div className="flex-1 overflow-y-auto custom-scrollbar">
+                     {standupHistory.length === 0 ? (
+                       <div className="p-3 text-xs text-text-tertiary">No saved standups yet.</div>
+                     ) : (
+                       standupHistory.map((entry: any) => (
+                         <button
+                           key={entry.date}
+                           onClick={() => { setStandupReport(entry.report); setSelectedStandupDate(entry.date); }}
+                           className={`w-full text-left px-3 py-2.5 text-xs border-b border-border/50 transition-colors hover:bg-surface ${
+                             selectedStandupDate === entry.date ? 'bg-accent/10 text-accent font-bold border-l-2 border-l-accent' : 'text-text-secondary'
+                           }`}
+                         >
+                           <div className="font-mono">{entry.date}</div>
+                           <div className="text-[10px] text-text-tertiary mt-0.5">Saved {new Date(entry.saved_at).toLocaleTimeString()}</div>
+                         </button>
+                       ))
+                     )}
+                   </div>
+                 </div>
+
+                 {/* Report Display */}
+                 <div className="flex-1 bg-transparent border border-border rounded-xl p-6 overflow-y-auto custom-scrollbar">
+                    {standupReport ? <StandupRenderer text={standupReport} /> : <span className="text-text-tertiary font-mono text-sm">No standup generated yet. Click the button above to execute the protocol.</span>}
+                 </div>
                </div>
             </div>
           )}
