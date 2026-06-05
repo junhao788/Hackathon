@@ -797,10 +797,20 @@ async def execute_auto_triage(project_id: str, issue_iid: int, issue_data: dict)
         if not assignee_username or assignee_username.lower() in ["none", "null", ""]:
             assignable_roster = [m for m in team_roster if m.get("assignable", True) is not False]
             if assignable_roster:
-                # Pick the one with the lowest workload as a safe default
-                sorted_roster = sorted(assignable_roster, key=lambda x: x.get("current_open_issues", 0))
+                # Basic skill matching for fallback
+                issue_text = (issue_info.get("title", "") + " " + issue_info.get("description", "")).lower()
+                for m in assignable_roster:
+                    m["score"] = m.get("current_open_issues", 0) * 10  # Lower is better
+                    # If skills match issue text, give them a negative score (bonus)
+                    skills = [s.lower() for s in m.get("skills", [])]
+                    for skill in skills:
+                        if skill in issue_text:
+                            m["score"] -= 5
+                
+                # Pick the one with the lowest score as a safe default
+                sorted_roster = sorted(assignable_roster, key=lambda x: x.get("score", 0))
                 assignee_username = sorted_roster[0].get("username")
-                reason += "\n\n*(Fallback Note: AI failed to confidently pick a candidate, so we auto-assigned the developer with the lowest workload.)*"
+                reason += "\n\n*(Fallback Note: AI failed to confidently pick a candidate, so we auto-assigned the developer with the best skill/workload ratio.)*"
             else:
                 assignee_username = "Unassigned"
         
