@@ -672,7 +672,7 @@ def scaffold_project(project_id: str, clone_url: str, framework: str) -> dict:
     temp_dir = tempfile.mkdtemp()
     
     try:
-        subprocess.run(f"git clone {auth_url} .", cwd=temp_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=30)
+        subprocess.run(f"git clone {auth_url} .", cwd=temp_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=60)
         
         # Clear all files (like README.md from repo initialization) except .git so npm create doesn't abort
         for item in os.listdir(temp_dir):
@@ -684,11 +684,11 @@ def scaffold_project(project_id: str, clone_url: str, framework: str) -> dict:
                     os.remove(item_path)
                     
         if framework == "react-ts":
-            subprocess.run("npm create vite@latest . -- --template react-ts", cwd=temp_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=60)
+            subprocess.run("npm create vite@latest . -- --template react-ts", cwd=temp_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=120)
         elif framework == "vue-ts":
-            subprocess.run("npm create vite@latest . -- --template vue-ts", cwd=temp_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=60)
+            subprocess.run("npm create vite@latest . -- --template vue-ts", cwd=temp_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=120)
         elif framework == "nextjs":
-            subprocess.run("npx create-next-app@latest . --ts --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm", cwd=temp_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=60)
+            subprocess.run("npx --yes create-next-app@latest . --ts --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm", cwd=temp_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=300)
         elif framework == "python-fastapi":
             with open(os.path.join(temp_dir, "app.py"), "w") as f:
                 f.write("from fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get('/')\ndef read_root():\n    return {'Hello': 'World'}\n")
@@ -696,7 +696,7 @@ def scaffold_project(project_id: str, clone_url: str, framework: str) -> dict:
                 f.write("fastapi\nuvicorn\n")
         elif framework == "node-express":
             subprocess.run("npm init -y", cwd=temp_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=30)
-            subprocess.run("npm install express", cwd=temp_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=60)
+            subprocess.run("npm install express", cwd=temp_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=120)
             with open(os.path.join(temp_dir, "index.js"), "w") as f:
                 f.write("const express = require('express');\nconst app = express();\n\napp.get('/', (req, res) => res.send('Hello World'));\n\napp.listen(3000, () => console.log('Server ready'));\n")
         elif framework.startswith("fullstack-"):
@@ -706,9 +706,9 @@ def scaffold_project(project_id: str, clone_url: str, framework: str) -> dict:
             os.mkdir(backend_dir)
             
             if "react" in framework:
-                subprocess.run("npm create vite@latest . -- --template react-ts", cwd=frontend_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=60)
+                subprocess.run("npm create vite@latest . -- --template react-ts", cwd=frontend_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=120)
             elif "vue" in framework:
-                subprocess.run("npm create vite@latest . -- --template vue-ts", cwd=frontend_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=60)
+                subprocess.run("npm create vite@latest . -- --template vue-ts", cwd=frontend_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=120)
                 
             if "fastapi" in framework:
                 with open(os.path.join(backend_dir, "app.py"), "w") as f:
@@ -717,7 +717,7 @@ def scaffold_project(project_id: str, clone_url: str, framework: str) -> dict:
                     f.write("fastapi\nuvicorn\n")
             elif "express" in framework:
                 subprocess.run("npm init -y", cwd=backend_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=30)
-                subprocess.run("npm install express", cwd=backend_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=60)
+                subprocess.run("npm install express", cwd=backend_dir, shell=True, stdin=subprocess.DEVNULL, check=True, timeout=120)
                 with open(os.path.join(backend_dir, "index.js"), "w") as f:
                     f.write("const express = require('express');\nconst app = express();\n\napp.get('/', (req, res) => res.send('Hello World'));\n\napp.listen(3000, () => console.log('Server ready'));\n")
         
