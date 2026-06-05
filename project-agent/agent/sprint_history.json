@@ -1,581 +1,117 @@
 {
-  "82685972": [
+  "default": [
     {
+      "sprint_id": "1780000000",
+      "created_at": 1780000000.0,
+      "team_size": 5,
+      "per_person_capacity_hours": 25,
+      "sprint_capacity_hours": 125,
+      "sprint_used_hours": 58,
       "board": [
         {
           "columnName": "P0 CRITICAL",
           "cards": [
             {
-              "title": "Frontend: Develop Standup Submission Dashboard",
-              "description": "Create the main dashboard where users can input their daily standup information.",
-              "badges": [],
-              "checked": false
-            },
-            {
-              "title": "Frontend: Implement Standup History and Progress View",
-              "description": "Develop a view to display historical standup data and track overall project progress.",
-              "badges": [],
-              "checked": false
-            },
-            {
-              "title": "Backend: Setup Python/FastAPI and Docker",
-              "description": "Set up the backend environment with Python, FastAPI, and Docker for containerization.",
-              "badges": [],
-              "checked": false
-            },
-            {
-              "title": "Backend: Create Standup Data API Endpoints",
-              "description": "Develop the necessary API endpoints for submitting and retrieving standup data.",
-              "badges": [],
-              "checked": false
-            },
-            {
-              "title": "Backend: AI Blocker Summarization",
-              "description": "Implement AI functionality to summarize reported blockers from standups.",
-              "badges": [],
-              "checked": false
-            },
-            {
-              "title": "Backend: Weekly Report Generation and Emailing",
-              "description": "Create a system to generate weekly reports based on standup data and email them to stakeholders.",
-              "badges": [],
-              "checked": false
-            }
-          ]
-        },
-        {
-          "columnName": "P1 HIGH PRIORITY",
-          "cards": []
-        },
-        {
-          "columnName": "BACKLOG",
-          "cards": []
-        }
-      ],
-      "sprint_id": "1780152867",
-      "created_at": 1780152867.3179784
-    }
-  ],
-  "82722207": [
-    {
-      "board": [
-        {
-          "columnName": "P0 CRITICAL",
-          "cards": [
-            {
-              "title": "Frontend: Project Setup",
-              "description": "Initialize the frontend project environment.",
-              "badges": [
-                "Frontend",
-                "Setup"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: Project Setup",
-              "description": "Initialize the backend project environment.",
-              "badges": [
-                "Backend",
-                "Setup"
-              ],
-              "checked": false
-            }
-          ]
-        },
-        {
-          "columnName": "P1 HIGH PRIORITY",
-          "cards": [
-            {
-              "title": "Frontend: Chat Interface Layout",
-              "description": "Design and implement the main chat UI layout.",
-              "badges": [
-                "Frontend",
-                "UI"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: WebSocket Connection Handler",
-              "description": "Implement WebSocket connection handling for real-time messaging.",
-              "badges": [
-                "Backend",
-                "WebSocket"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: Message Persistence API",
-              "description": "Create API endpoints to store and retrieve chat messages.",
-              "badges": [
-                "Backend",
-                "API"
-              ],
-              "checked": false
-            }
-          ]
-        },
-        {
-          "columnName": "BACKLOG",
-          "cards": []
-        }
-      ],
-      "sprint_id": "1780208926",
-      "created_at": 1780208926.886167
-    },
-    {
-      "board": [
-        {
-          "columnName": "P0 CRITICAL",
-          "cards": [
-            {
-              "title": "Frontend: Project Setup",
-              "description": "Initialize the frontend project environment.",
-              "badges": [
-                "Frontend",
-                "Setup"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: Project Setup",
-              "description": "Initialize the backend project environment.",
-              "badges": [
-                "Backend",
-                "Setup"
-              ],
-              "checked": false
-            }
-          ]
-        },
-        {
-          "columnName": "P1 HIGH PRIORITY",
-          "cards": [
-            {
-              "title": "Frontend: Chat Interface Layout",
-              "description": "Develop the primary chat interface UI.",
-              "badges": [
-                "Frontend",
-                "UI"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: WebSocket Connection Handler",
-              "description": "Implement WebSocket logic for real-time messaging.",
-              "badges": [
-                "Backend",
-                "Real-time"
-              ],
-              "checked": false
-            }
-          ]
-        },
-        {
-          "columnName": "BACKLOG",
-          "cards": [
-            {
-              "title": "Backend: Message Persistence API",
-              "description": "Implement endpoints for storing and retrieving messages.",
-              "badges": [
-                "Backend",
-                "Database"
-              ],
-              "checked": false
-            }
-          ]
-        }
-      ],
-      "sprint_id": "1780204576",
-      "created_at": 1780204576.7656868
-    }
-  ],
-  "82763081": [
-    {
-      "board": [
-        {
-          "columnName": "P0 CRITICAL",
-          "cards": [
-            {
-              "title": "Frontend: Project Setup and Dependencies",
-              "description": "Initialize project structure and essential dependencies.",
-              "badges": [
-                "Frontend",
-                "Setup"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: Configuration Setup",
-              "description": "Initialize backend configurations.",
-              "badges": [
-                "Backend",
-                "Setup"
-              ],
-              "checked": false
-            }
-          ]
-        },
-        {
-          "columnName": "P1 HIGH PRIORITY",
-          "cards": [
-            {
-              "title": "Frontend: MetaMask Connection UI",
-              "description": "Implement UI for MetaMask wallet connection.",
-              "badges": [
-                "Frontend",
-                "UI"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: API Skeleton",
-              "description": "Set up core API endpoints.",
-              "badges": [
-                "Backend",
-                "API"
-              ],
-              "checked": false
-            }
-          ]
-        },
-        {
-          "columnName": "BACKLOG",
-          "cards": [
-            {
-              "title": "Frontend: Wallet Provider Context",
-              "description": "Implement React Context for wallet state management.",
-              "badges": [
-                "Frontend"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Frontend: Dashboard View",
-              "description": "Build the main dashboard view.",
-              "badges": [
-                "Frontend",
-                "UI"
-              ],
-              "checked": false
-            }
-          ]
-        }
-      ],
-      "sprint_id": "1780328339",
-      "created_at": 1780328339.412054
-    }
-  ],
-  "82763419": [
-    {
-      "board": [
-        {
-          "columnName": "P0 CRITICAL",
-          "cards": [
-            {
-              "title": "Backend: Health Data Database Schema",
-              "description": "Define schema for health tracking.",
-              "badges": [
-                "High",
-                "Database"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: JWT Authentication Implementation",
-              "description": "Implement secure auth.",
-              "badges": [
-                "High",
-                "Security"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Frontend: Login/Signup Authentication Pages",
-              "description": "Build auth UI.",
-              "badges": [
-                "High",
-                "Frontend"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Frontend: Patient Dashboard UI",
-              "description": "Build primary dashboard.",
-              "badges": [
-                "High",
-                "Frontend"
-              ],
-              "checked": false
-            }
-          ]
-        },
-        {
-          "columnName": "P1 HIGH PRIORITY",
-          "cards": [
-            {
-              "title": "Backend: User Health Data API Endpoint",
-              "description": "Expose health data.",
-              "badges": [
-                "Medium",
-                "API"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: Mi Band Bluetooth GATT Profile Integration",
-              "description": "Core BLE integration.",
-              "badges": [
-                "Medium",
-                "Hardware"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Frontend: Health Metrics Charts",
-              "description": "Visualize health data.",
-              "badges": [
-                "Medium",
-                "Frontend"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Frontend: User Profile and Medical History Page",
-              "description": "Profile management UI.",
-              "badges": [
-                "Medium",
-                "Frontend"
-              ],
-              "checked": false
-            }
-          ]
-        },
-        {
-          "columnName": "BACKLOG",
-          "cards": [
-            {
-              "title": "Backend: Unit Tests for Data Decryption",
-              "description": "Validate decryption.",
-              "badges": [
-                "Testing"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: Error Handling and Logging",
-              "description": "System stability.",
-              "badges": [
-                "Maintenance"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Frontend: Responsive Layout for Mobile",
-              "description": "Improve mobile UI.",
-              "badges": [
-                "Frontend"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Frontend: Alert Notification System UI",
-              "description": "Notification UI.",
-              "badges": [
-                "Frontend"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Frontend: Mi Band Device Pairing UI",
-              "description": "Pairing UX.",
-              "badges": [
-                "Frontend"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: Mi Band Data Sync Job",
-              "description": "Data processing.",
-              "badges": [
-                "Backend"
-              ],
-              "checked": false
-            },
-            {
-              "title": "Backend: Health Data Decryption Module",
-              "description": "Security logic.",
-              "badges": [
-                "Backend"
-              ],
-              "checked": false
-            }
-          ]
-        }
-      ],
-      "sprint_id": "1780329055",
-      "created_at": 1780329055.676876
-    }
-  ],
-  "82764343": [
-    {
-      "sprint_capacity_hours": 35,
-      "sprint_used_hours": 35,
-      "board": [
-        {
-          "columnName": "P0 CRITICAL",
-          "cards": [
-            {
-              "title": "Backend: User Authentication API",
-              "description": "Implement JWT-based authentication endpoints.",
-              "badges": [
-                "High",
-                "Backend"
-              ],
+              "title": "Bug: 500 Internal Server Error on /api/v1/payments webhook",
+              "description": "Production bug causing stripe integration to fail.",
+              "badges": ["Backend", "Bug"],
               "checked": false,
-              "estimated_hours": 8
+              "estimated_hours": 8,
+              "assigned_to": "crystalchong000813"
             },
             {
-              "title": "Frontend: Kanban Board View",
-              "description": "Create the main drag-and-drop kanban board interface.",
-              "badges": [
-                "High",
-                "Frontend"
-              ],
-              "checked": false,
-              "estimated_hours": 8
-            },
-            {
-              "title": "Backend: Tasks CRUD Endpoints",
-              "description": "Implement API for creating, reading, updating, and deleting tasks.",
-              "badges": [
-                "High",
-                "Backend"
-              ],
-              "checked": false,
-              "estimated_hours": 8
-            },
-            {
-              "title": "Frontend: Task Card Component",
-              "description": "Develop reusable task card UI component.",
-              "badges": [
-                "Frontend"
-              ],
-              "checked": false,
-              "estimated_hours": 6
-            },
-            {
-              "title": "Frontend: Dashboard Sidebar Component",
-              "description": "Build the navigation sidebar.",
-              "badges": [
-                "Frontend"
-              ],
-              "checked": false,
-              "estimated_hours": 5
-            }
-          ]
-        },
-        {
-          "columnName": "P1 HIGH PRIORITY",
-          "cards": []
-        },
-        {
-          "columnName": "BACKLOG",
-          "cards": [
-            {
-              "title": "Backend: Search and Filter API",
-              "description": "Enable advanced search and filtering for tasks.",
-              "badges": [
-                "Backend"
-              ],
-              "checked": false,
-              "estimated_hours": 4
-            },
-            {
-              "title": "Backend: Database Migration Scripts",
-              "description": "Create schema migration scripts.",
-              "badges": [
-                "Backend"
-              ],
-              "checked": false,
-              "estimated_hours": 4
-            },
-            {
-              "title": "Backend: API Rate Limiting Middleware",
-              "description": "Implement rate limiting for API protection.",
-              "badges": [
-                "Backend"
-              ],
-              "checked": false,
-              "estimated_hours": 3
-            },
-            {
-              "title": "Backend: WebSocket Notifications",
-              "description": "Set up real-time notifications via WebSockets.",
-              "badges": [
-                "Backend"
-              ],
-              "checked": false,
-              "estimated_hours": 6
-            },
-            {
-              "title": "Backend: Analytics Aggregation Logic",
-              "description": "Logic for calculating sprint metrics.",
-              "badges": [
-                "Backend"
-              ],
-              "checked": false,
-              "estimated_hours": 4
-            },
-            {
-              "title": "Backend: Sprints Data Model",
-              "description": "Define sprints schema and relationships.",
-              "badges": [
-                "Backend"
-              ],
-              "checked": false,
-              "estimated_hours": 3
-            },
-            {
-              "title": "Frontend: Navigation Header",
-              "description": "Create global navigation header.",
-              "badges": [
-                "Frontend"
-              ],
+              "title": "Bug: Dashboard summary cards display NaN",
+              "description": "Frontend calculating undefined states.",
+              "badges": ["Frontend", "Bug"],
               "checked": true,
-              "estimated_hours": 3
+              "estimated_hours": 4,
+              "assigned_to": "JunnnHaoooo"
             },
             {
-              "title": "Frontend: Create Task Modal",
-              "description": "Build modal for adding new tasks.",
-              "badges": [
-                "Frontend"
-              ],
+              "title": "Backend: Auth API system",
+              "description": "Core JWT authentication.",
+              "badges": ["Backend", "Core"],
               "checked": false,
-              "estimated_hours": 4
+              "estimated_hours": 6,
+              "assigned_to": "nexus_ai_core"
             },
             {
-              "title": "Frontend: User Profile Page",
-              "description": "Create user profile viewing and editing.",
-              "badges": [
-                "Frontend"
-              ],
+              "title": "DevOps: Set up CI/CD pipeline",
+              "description": "Automated deployments to Render/Vercel.",
+              "badges": ["DevOps", "Infrastructure"],
               "checked": false,
-              "estimated_hours": 4
+              "estimated_hours": 8,
+              "assigned_to": "omni_ai_ops"
+            }
+          ]
+        },
+        {
+          "columnName": "P1 HIGH PRIORITY",
+          "cards": [
+            {
+              "title": "Frontend: Global API service layer",
+              "description": "Axios interceptors and base classes.",
+              "badges": ["Frontend", "Architecture"],
+              "checked": false,
+              "estimated_hours": 6,
+              "assigned_to": "alpha_ai_dev"
             },
             {
-              "title": "Frontend: Sprint Progress Chart",
-              "description": "Visualize sprint progress data.",
-              "badges": [
-                "Frontend"
-              ],
+              "title": "Frontend: Transaction list page",
+              "description": "Main UI for displaying transactions.",
+              "badges": ["Frontend", "UI"],
               "checked": false,
-              "estimated_hours": 4
+              "estimated_hours": 6,
+              "assigned_to": "JunnnHaoooo"
+            },
+            {
+              "title": "Backend: Account API - CRUD",
+              "description": "Endpoints for account management.",
+              "badges": ["Backend", "API"],
+              "checked": false,
+              "estimated_hours": 4,
+              "assigned_to": "crystalchong000813"
+            },
+            {
+              "title": "Backend: Dashboard Analytics API",
+              "description": "Aggregation endpoints for frontend charts.",
+              "badges": ["Backend", "API"],
+              "checked": false,
+              "estimated_hours": 4,
+              "assigned_to": "nexus_ai_core"
+            }
+          ]
+        },
+        {
+          "columnName": "BACKLOG",
+          "cards": [
+            {
+              "title": "Integration: Auth guard for routes",
+              "description": "Protect private routes with middleware.",
+              "badges": ["Frontend", "Auth"],
+              "checked": false,
+              "estimated_hours": 4,
+              "assigned_to": "alpha_ai_dev"
+            },
+            {
+              "title": "Frontend: Category management page",
+              "description": "UI for managing expense categories.",
+              "badges": ["Frontend", "UI"],
+              "checked": false,
+              "estimated_hours": 4,
+              "assigned_to": "JunnnHaoooo"
+            },
+            {
+              "title": "Frontend: Account management page",
+              "description": "Settings UI for accounts.",
+              "badges": ["Frontend", "UI"],
+              "checked": false,
+              "estimated_hours": 4,
+              "assigned_to": "JunnnHaoooo"
             }
           ]
         }
-      ],
-      "sprint_id": "1780330910",
-      "created_at": 1780330910.7996502
+      ]
     }
   ]
 }

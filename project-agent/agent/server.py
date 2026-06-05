@@ -72,7 +72,7 @@ async def get_sprint_history(project_id: str):
             return {"sprints": []}
         with open(SPRINT_HISTORY_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return {"sprints": data.get(project_id, [])}
+        return {"sprints": data.get(project_id, data.get("default", []))}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

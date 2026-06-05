@@ -39,6 +39,36 @@
       "current_open_issues": 0,
       "availability": "Medium",
       "timezone": "UTC+8"
+    },
+    {
+      "name": "Alpha AI",
+      "username": "alpha_ai_dev",
+      "role": "Frontend Specialist",
+      "skills": ["React", "Vue", "CSS", "UI/UX"],
+      "experience_level": "Mid",
+      "current_open_issues": 0,
+      "availability": "High",
+      "timezone": "UTC+8"
+    },
+    {
+      "name": "Nexus AI",
+      "username": "nexus_ai_core",
+      "role": "Fullstack Developer",
+      "skills": ["Node.js", "Typescript", "Next.js", "MongoDB"],
+      "experience_level": "Senior",
+      "current_open_issues": 0,
+      "availability": "High",
+      "timezone": "UTC+8"
+    },
+    {
+      "name": "Omni AI",
+      "username": "omni_ai_ops",
+      "role": "DevOps Engineer",
+      "skills": ["Docker", "Kubernetes", "CI/CD", "AWS"],
+      "experience_level": "Senior",
+      "current_open_issues": 0,
+      "availability": "High",
+      "timezone": "UTC+8"
     }
   ]
 }
