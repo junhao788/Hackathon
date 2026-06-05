@@ -801,11 +801,26 @@ async def execute_auto_triage(project_id: str, issue_iid: int, issue_data: dict)
                 issue_text = (issue_info.get("title", "") + " " + issue_info.get("description", "")).lower()
                 for m in assignable_roster:
                     m["score"] = m.get("current_open_issues", 0) * 10  # Lower is better
-                    # If skills match issue text, give them a negative score (bonus)
+                    
+                    # 1. Skill Matching Bonus
                     skills = [s.lower() for s in m.get("skills", [])]
                     for skill in skills:
                         if skill in issue_text:
                             m["score"] -= 5
+                            
+                    # 2. Role/Domain Matching Bonus
+                    dev_role = m.get("role", "").lower()
+                    DOMAIN_KEYWORDS = {
+                        "frontend": ["ui", "button", "page", "component", "css", "style", "view", "interface", "client"],
+                        "backend": ["api", "database", "server", "endpoint", "query", "data", "model", "schema", "logic"],
+                        "devops": ["deploy", "host", "pipeline", "ci/cd", "cloud", "server", "firebase", "render", "vercel", "connection", "infrastructure", "docker", "build"]
+                    }
+                    
+                    for domain, keywords in DOMAIN_KEYWORDS.items():
+                        if domain in dev_role:
+                            for kw in keywords:
+                                if kw in issue_text:
+                                    m["score"] -= 3  # Role-based bonus
                 
                 # Pick the one with the lowest score as a safe default
                 sorted_roster = sorted(assignable_roster, key=lambda x: x.get("score", 0))
