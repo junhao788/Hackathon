@@ -810,7 +810,6 @@ async def execute_auto_triage(project_id: str, issue_iid: int, issue_data: dict)
                 # Pick the one with the lowest score as a safe default
                 sorted_roster = sorted(assignable_roster, key=lambda x: x.get("score", 0))
                 assignee_username = sorted_roster[0].get("username")
-                reason += "\n\n*(Fallback Note: AI failed to confidently pick a candidate, so we auto-assigned the developer with the best skill/workload ratio.)*"
             else:
                 assignee_username = "Unassigned"
         
