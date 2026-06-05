@@ -1647,19 +1647,21 @@ export default function Dashboard() {
                           const idPrefix = isIssue ? '#' : '!';
                           const actionWord = event.data.action_word;
                           
-                          return (
-                            <a 
-                              key={idx} 
-                              href={event.data.web_url} 
-                              target="_blank" 
-                              rel="noreferrer"
-                              className="group flex flex-wrap md:flex-nowrap items-start md:items-center gap-x-3 gap-y-1 py-1.5 px-2 rounded hover:bg-white/5 transition-colors text-text-secondary"
-                            >
-                              <span className="text-text-tertiary/60 shrink-0 select-none">[{dateStr}]</span>
-                              <span className={`shrink-0 select-none font-bold ${tagColor}`}>[{tagText}]</span>
-                              <div className="flex-1 min-w-0 flex items-center gap-2 truncate">
-                                <span className="text-blue-400 shrink-0">@{event.data.author}</span>
-                                <span className="shrink-0 text-text-tertiary select-none">{actionWord}</span>
+                                  const actionColor = actionWord === 'opened' ? 'text-green-400' : actionWord === 'closed' ? 'text-red-400' : actionWord === 'merged' ? 'text-purple-400' : 'text-text-tertiary';
+                                  
+                                  return (
+                                    <a 
+                                      key={idx} 
+                                      href={event.data.web_url} 
+                                      target="_blank" 
+                                      rel="noreferrer"
+                                      className="group flex flex-wrap md:flex-nowrap items-start md:items-center gap-x-3 gap-y-1 py-1.5 px-2 rounded hover:bg-white/5 transition-colors text-text-secondary"
+                                    >
+                                      <span className="text-text-tertiary/60 shrink-0 select-none">[{dateStr}]</span>
+                                      <span className={`shrink-0 select-none font-bold ${tagColor}`}>[{tagText}]</span>
+                                      <div className="flex-1 min-w-0 flex items-center gap-2 truncate">
+                                        <span className="text-blue-400 shrink-0">@{event.data.author}</span>
+                                        <span className={`shrink-0 select-none font-medium ${actionColor}`}>{actionWord}</span>
                                 <span className={`${tagColor} font-bold shrink-0`}>{idPrefix}{event.data.iid}:</span>
                                 <span className="text-text-primary group-hover:text-white transition-colors truncate">{event.data.title}</span>
                               </div>
