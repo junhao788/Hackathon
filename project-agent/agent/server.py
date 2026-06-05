@@ -793,6 +793,16 @@ async def execute_auto_triage(project_id: str, issue_iid: int, issue_data: dict)
         labels = triage_json.get("labels", [])
         reason = triage_json.get("reason", "")
         
+        # Fallback if AI hallucinates "None"
+        if not assignee_username or assignee_username.lower() in ["none", "null", ""]:
+            if team_roster:
+                # Pick the one with the lowest workload as a safe default
+                sorted_roster = sorted(team_roster, key=lambda x: x.get("current_open_issues", 0))
+                assignee_username = sorted_roster[0].get("username")
+                reason += "\n\n*(Fallback Note: AI failed to confidently pick a candidate, so we auto-assigned the developer with the lowest workload.)*"
+            else:
+                assignee_username = "Unassigned"
+        
         print(f"   ✅ AI decided to assign to @{assignee_username} with labels {labels}")
         
         from agent.gitlab_api import get_user_by_username, update_issue, post_issue_comment
@@ -810,7 +820,10 @@ async def execute_auto_triage(project_id: str, issue_iid: int, issue_data: dict)
             print(f"   ❌ Failed to update issue: {update_res.get('error')}")
             
         # 6. Post comment
-        comment_body = f"🤖 **AI Auto-Triage Applied!**\n\n**Assigned to:** `@{assignee_username}`\n\n**Reasoning:** {reason}\n\n*This issue was automatically routed based on team skillsets and current workloads.*"
+        if assignee_username == "Unassigned":
+            comment_body = f"🤖 **AI Auto-Triage Applied!**\n\n**Assigned to:** Unassigned\n\n**Reasoning:** {reason}\n\n*This issue was automatically routed based on team skillsets and current workloads.*"
+        else:
+            comment_body = f"🤖 **AI Auto-Triage Applied!**\n\n**Assigned to:** `@{assignee_username}`\n\n**Reasoning:** {reason}\n\n*This issue was automatically routed based on team skillsets and current workloads.*"
         post_res = post_issue_comment(project_id, issue_iid, comment_body)
         if post_res.get("status") == "success":
             print(f"   ✅ Successfully posted triage comment on issue #{issue_iid}")
