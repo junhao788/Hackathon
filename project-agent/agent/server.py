@@ -795,9 +795,10 @@ async def execute_auto_triage(project_id: str, issue_iid: int, issue_data: dict)
         
         # Fallback if AI hallucinates "None"
         if not assignee_username or assignee_username.lower() in ["none", "null", ""]:
-            if team_roster:
+            assignable_roster = [m for m in team_roster if m.get("assignable", True) is not False]
+            if assignable_roster:
                 # Pick the one with the lowest workload as a safe default
-                sorted_roster = sorted(team_roster, key=lambda x: x.get("current_open_issues", 0))
+                sorted_roster = sorted(assignable_roster, key=lambda x: x.get("current_open_issues", 0))
                 assignee_username = sorted_roster[0].get("username")
                 reason += "\n\n*(Fallback Note: AI failed to confidently pick a candidate, so we auto-assigned the developer with the lowest workload.)*"
             else:
