@@ -64,7 +64,7 @@
       "name": "Omni AI",
       "username": "omni_ai_ops",
       "role": "DevOps Engineer",
-      "skills": ["Docker", "Kubernetes", "CI/CD", "AWS"],
+      "skills": ["Docker", "Kubernetes", "CI/CD", "AWS", "Deploy", "Render", "Vercel"],
       "experience_level": "Senior",
       "current_open_issues": 0,
       "availability": "High",
