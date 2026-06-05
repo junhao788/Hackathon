@@ -89,6 +89,37 @@ async def save_sprint_history(project_id: str, request: SprintSaveRequest):
         
         try:
             parsed_sprint = json.loads(request.sprint_data)
+            
+            # --- CAPACITY ENFORCEMENT ALGORITHM ---
+            board = parsed_sprint.get("board", [])
+            backlog_col = next((c for c in board if c.get("columnName") == "BACKLOG"), None)
+            
+            if not backlog_col:
+                backlog_col = {"columnName": "BACKLOG", "cards": []}
+                board.append(backlog_col)
+                
+            user_hours = {}
+            for col in board:
+                if col.get("columnName") == "BACKLOG":
+                    continue
+                
+                kept_cards = []
+                for card in col.get("cards", []):
+                    assignee = card.get("assigned_to")
+                    hours = float(card.get("estimated_hours", 0) or 0)
+                    
+                    if assignee:
+                        current = user_hours.get(assignee, 0)
+                        if current + hours > 25:
+                            backlog_col["cards"].append(card)
+                        else:
+                            user_hours[assignee] = current + hours
+                            kept_cards.append(card)
+                    else:
+                        kept_cards.append(card)
+                col["cards"] = kept_cards
+            # --- END CAPACITY ENFORCEMENT ---
+            
         except json.JSONDecodeError:
             raise HTTPException(status_code=400, detail="Invalid sprint JSON data")
             

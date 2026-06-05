@@ -223,7 +223,8 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
    - Call `get_company_directory()` to read the full company talent pool with their skills and GitLab user IDs.
    - Analyze the project idea to determine what skills are needed (e.g., React, Python, DevOps).
    - Select the 3-5 best-matching engineers based on skill match, availability, and experience level.
-   - For EACH selected engineer, call `add_project_member(project_id=NEW_PROJECT_ID, user_id=their_gitlab_user_id, access_level=30)` to invite them to the repository with Developer permissions.
+   - For EACH selected engineer, if they have a valid `gitlab_user_id`, call `add_project_member(project_id=NEW_PROJECT_ID, user_id=their_gitlab_user_id, access_level=30)` to invite them.
+   - CRITICAL: If an engineer (like an AI agent) has a `null` or missing `gitlab_user_id`, DO NOT skip them! Still select them for the team and assign them tasks in Step 3! Just skip the `add_project_member` step for them.
 
    STEP 2.5 - PRODUCT BLUEPRINT (Think Before You Build):
    - BEFORE creating any issues, you MUST first design a COMPLETE product blueprint in your mind.
