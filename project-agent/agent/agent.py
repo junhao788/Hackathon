@@ -220,11 +220,14 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
        *MONO-REPO RULE*: If the user requests BOTH a frontend and a backend in the same project, but they explicitly want separated languages (e.g. Vue UI + FastAPI backend instead of Next.js), you MUST choose the appropriate `fullstack-*` option to build a mono-repo.
 
    STEP 2 - TALENT ACQUISITION (Auto-Invite):
-   - Call `get_company_directory()` to read the full company talent pool with their skills and GitLab user IDs.
-   - Analyze the project idea to determine what skills are needed (e.g., React, Python, DevOps).
-   - Select the 3-5 best-matching engineers based on skill match, availability, and experience level.
-   - For EACH selected engineer, if they have a valid `gitlab_user_id`, call `add_project_member(project_id=NEW_PROJECT_ID, user_id=their_gitlab_user_id, access_level=30)` to invite them.
-   - CRITICAL: If an engineer (like an AI agent) has a `null` or missing `gitlab_user_id`, DO NOT skip them! Still select them for the team and assign them tasks in Step 3! Just skip the `add_project_member` step for them.
+    - Call `get_company_directory()` to read the full company talent pool with their skills and GitLab user IDs.
+    - Analyze the project idea to determine what skills are needed (e.g., React, Python, DevOps).
+    - Select engineers to invite according to these STRICT TEAM COMPOSITION RULES:
+      1. A project can have at most 5 people including the project owner/lead (Werd How / howwerd0898).
+      2. The selected team must consist of: at most 1 Junior Frontend developer paired with at most 1 Mid/Senior Frontend developer, and at most 1 Junior Backend developer paired with at most 1 Mid/Senior Backend developer.
+      3. Do NOT distribute roles equally or randomly to everyone in the company. Check their experience_level, role, availability, and current workload. Prefer developers with "High" or "Medium" availability who are not already overloaded.
+      4. Only select engineers who match the required stack (e.g., frontend developers for frontend tasks, backend developers for backend tasks).
+    - For EACH selected engineer, call `add_project_member(project_id=NEW_PROJECT_ID, user_id=their_gitlab_user_id, access_level=30, username=their_username)` to invite them. Note: you must pass BOTH `user_id` and `username` so mock users without a valid `user_id` can still be registered in the project memberships.
 
    STEP 2.5 - PRODUCT BLUEPRINT (Think Before You Build):
    - BEFORE creating any issues, you MUST first design a COMPLETE product blueprint in your mind.
@@ -304,12 +307,13 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
      * "Frontend: API client service layer & error handling interceptor" — estimate 4-6 hours
    
    ISSUE QUALITY RULES:
-   - Every issue description MUST be detailed and structured with markdown headers and bullet points as shown above.
-   - ONLY assign tasks to the engineers invited in Step 2 based on their skills.
-   - SUPER CRITICAL: DO NOT INVENT OR HALLUCINATE USERNAMES. You MUST ONLY use exact usernames from `get_company_directory()`.
-   - ESTIMATED HOURS: Use values from this range: 2, 4, 6, 8, 10, 12, 16. Larger grouped issues (like full CRUD or complex pages) should be 8-16 hours. Small integration tasks can be 2-4 hours.
-   - Call `batch_create_and_assign_issues` passing the NEW PROJECT'S ID (as a string) and a JSON string of issues.
-   - FINAL CHECK: Count your issues. If you have fewer than 15, you MUST go back and add more. Split complex issues, add more pages, or add more backend services.
+    - Every issue description MUST be detailed and structured with markdown headers and bullet points as shown above.
+    - ONLY assign tasks to the engineers invited in Step 2 based on their specific skills and seniority.
+    - CRITICAL ASSIGNMENT RULE: Do not assign tasks equally to everyone. Assign complex/architectural frontend tasks to the Senior/Mid Frontend developer, simpler UI component tasks to the Junior Frontend developer, complex database/API design tasks to the Senior/Mid Backend developer, and simpler endpoint tasks to the Junior Backend developer. DevOps/CI/CD/Firebase tasks must be assigned to DevOps or Senior Backend specialists.
+    - SUPER CRITICAL: DO NOT INVENT OR HALLUCINATE USERNAMES. You MUST ONLY use exact usernames from `get_company_directory()`.
+    - ESTIMATED HOURS: Use values from this range: 2, 4, 6, 8, 10, 12, 16. Larger grouped issues (like full CRUD or complex pages) should be 8-16 hours. Small integration tasks can be 2-4 hours.
+    - Call `batch_create_and_assign_issues` passing the NEW PROJECT'S ID (as a string) and a JSON string of issues.
+    - FINAL CHECK: Count your issues. If you have fewer than 15, you MUST go back and add more. Split complex issues, add more pages, or add more backend services.
 
    FINAL OUTPUT:
    - After steps complete, return a STRICT JSON OBJECT. NO markdown, NO conversational text.

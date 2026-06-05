@@ -521,10 +521,11 @@ def get_project_members(project_id: str) -> dict:
     import json
     url = f"{GITLAB_API_URL}/projects/{project_id}/members/all"
     resp = requests.get(url, headers=HEADERS, params={"per_page": 100})
-    if resp.status_code != 200:
-        return {"error": f"Failed to fetch project members: {resp.text[:200]}"}
-    
-    members_raw = resp.json()
+    members_raw = []
+    if resp.status_code == 200:
+        members_raw = resp.json()
+    else:
+        print(f"Warning: GitLab API project members fetch failed ({resp.status_code}): {resp.text[:200]}")
     
     # Load the skill matrix from team_profiles.json for enrichment
     skill_matrix = {}
@@ -540,8 +541,10 @@ def get_project_members(project_id: str) -> dict:
     ACCESS_LEVELS = {10: "Guest", 20: "Reporter", 30: "Developer", 40: "Maintainer", 50: "Owner"}
     
     members = []
+    existing_usernames = set()
     for m in members_raw:
         username = m.get("username", "")
+        existing_usernames.add(username)
         profile = skill_matrix.get(username, {})
         members.append({
             "id": m.get("id"),
@@ -556,11 +559,62 @@ def get_project_members(project_id: str) -> dict:
             "assignable": profile.get("assignable", True),
             "current_open_issues": profile.get("current_open_issues", 0),
         })
+        
+    # Enrich with mock memberships from registry
+    registry_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mock_memberships.json")
+    if os.path.exists(registry_path):
+        try:
+            with open(registry_path, "r", encoding="utf-8") as f:
+                registry = json.load(f)
+            mock_users = registry.get(str(project_id), [])
+            for username in mock_users:
+                if username not in existing_usernames:
+                    existing_usernames.add(username)
+                    profile = skill_matrix.get(username, {})
+                    members.append({
+                        "id": None,
+                        "name": profile.get("name", username),
+                        "username": username,
+                        "avatar_url": None,
+                        "access_level": "Developer",
+                        "role": profile.get("role", "Developer"),
+                        "skills": profile.get("skills", []),
+                        "experience_level": profile.get("experience_level", "Mid"),
+                        "availability": profile.get("availability", "High"),
+                        "assignable": profile.get("assignable", True),
+                        "current_open_issues": profile.get("current_open_issues", 0),
+                    })
+        except Exception:
+            pass
+            
+    # Also check issues to find any mock/assigned users who aren't in existing_usernames
+    try:
+        issues_data = list_project_issues(project_id, state="all", per_page=100)
+        for issue in issues_data.get("issues", []):
+            for assignee in issue.get("assignees", []):
+                if assignee not in existing_usernames:
+                    existing_usernames.add(assignee)
+                    profile = skill_matrix.get(assignee, {})
+                    members.append({
+                        "id": None,
+                        "name": profile.get("name", assignee),
+                        "username": assignee,
+                        "avatar_url": None,
+                        "access_level": "Developer",
+                        "role": profile.get("role", "Developer"),
+                        "skills": profile.get("skills", []),
+                        "experience_level": profile.get("experience_level", "Mid"),
+                        "availability": profile.get("availability", "High"),
+                        "assignable": profile.get("assignable", True),
+                        "current_open_issues": profile.get("current_open_issues", 0),
+                    })
+    except Exception:
+        pass
     
     return {"members": members, "total": len(members)}
 
 
-def add_project_member(project_id: str, user_id: int, access_level: int = 30) -> dict:
+def add_project_member(project_id: str, user_id: int = None, access_level: int = 30, username: str = None) -> dict:
     """
     Add a user to a GitLab project with the specified access level.
     Access levels: 10=Guest, 20=Reporter, 30=Developer, 40=Maintainer.
@@ -569,9 +623,52 @@ def add_project_member(project_id: str, user_id: int, access_level: int = 30) ->
     
     Args:
         project_id: The ID of the GitLab project.
-        user_id: The GitLab user ID to invite.
+        user_id: The GitLab user ID to invite (optional for mock users).
         access_level: The access level (e.g. 30 for Developer).
+        username: The GitLab username (used for mock users lookup).
     """
+    if not user_id:
+        # Save to mock memberships JSON
+        name = "Mock AI User"
+        if username:
+            import json
+            profiles_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "team_profiles.json")
+            try:
+                with open(profiles_path, "r", encoding="utf-8") as f:
+                    profiles_data = json.load(f)
+                    for p in profiles_data.get("team", []):
+                        if p["username"] == username:
+                            name = p["name"]
+                            break
+            except Exception:
+                pass
+        else:
+            username = "mock_ai_user"
+
+        registry_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mock_memberships.json")
+        try:
+            registry = {}
+            if os.path.exists(registry_path):
+                with open(registry_path, "r", encoding="utf-8") as f:
+                    registry = json.load(f)
+            
+            project_mobs = registry.get(str(project_id), [])
+            if username not in project_mobs:
+                project_mobs.append(username)
+                registry[str(project_id)] = project_mobs
+                with open(registry_path, "w", encoding="utf-8") as f:
+                    json.dump(registry, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"Error saving mock membership: {e}")
+            
+        return {
+            "status": "success",
+            "message": f"User {username} (mock) added to project with Developer access.",
+            "username": username,
+            "name": name,
+            "access_level": access_level
+        }
+
     url = f"{GITLAB_API_URL}/projects/{project_id}/members"
     resp = requests.post(url, headers=HEADERS, json={
         "user_id": user_id,

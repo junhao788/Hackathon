@@ -69,6 +69,26 @@
       "current_open_issues": 0,
       "availability": "High",
       "timezone": "UTC+8"
+    },
+    {
+      "name": "Beta AI",
+      "username": "beta_ai_frontend",
+      "role": "Frontend Developer",
+      "skills": ["React", "HTML/CSS", "Javascript"],
+      "experience_level": "Junior",
+      "current_open_issues": 0,
+      "availability": "High",
+      "timezone": "UTC+8"
+    },
+    {
+      "name": "Delta AI",
+      "username": "delta_ai_backend",
+      "role": "Backend Developer",
+      "skills": ["Python", "FastAPI", "SQLite", "API"],
+      "experience_level": "Junior",
+      "current_open_issues": 0,
+      "availability": "High",
+      "timezone": "UTC+8"
     }
   ]
 }
