@@ -14,10 +14,10 @@ Our vision is to give every software team a tireless, deterministic AI agent tha
 OmniLead acts as an autonomous Staff Engineer and Project Manager integrated directly into your GitLab environment. You just give it a raw idea, and OmniLead builds the foundation, manages the team, and guards the code quality.
 
 **Core Capabilities:**
-- 🚀 **Launchpad (Zero-to-One):** Give OmniLead a raw project idea, and it executes a complete bootstrap. It creates the repository, scaffolds the tech stack, designs a 3-layer architectural blueprint (Pages, APIs, DB), and batches it into prioritized GitLab issues.
-- 👥 **Smart Talent Acquisition:** OmniLead dynamically analyzes global workloads across all projects and invites the perfect mix of developers (e.g., 1 Junior + 1 Senior per stack), strictly avoiding overloaded engineers.
+- 🚀 **Launchpad:** Give OmniLead a raw project idea, and it executes a complete bootstrap. It creates the repository, scaffolds the tech stack, designs a 3-layer architectural blueprint (Pages, APIs, DB), and batches it into prioritized GitLab issues.
+- 👥 **Smart Talent Acquisition:** OmniLead dynamically analyzes global workloads across all projects and invites the perfect mix of developers, strictly avoiding overloaded engineers.
 - 🧠 **AI Tech Lead:** OmniLead acts as an autonomous gatekeeper for your main branch. It reviews Merge Requests for security, performance, and types. It auto-merges pristine code and auto-remediates minor issues (pushing fix commits automatically).
-- ⏱️ **Autonomous Sprint Planner:** It organizes issues into active Sprints with strict capacity enforcement (max 25 hours/dev) and prioritizes foundational backend dependencies automatically.
+- ⏱️ **Autonomous Sprint Planner:** It organizes issues into active Sprints with strict capacity enforcement and prioritizes foundational backend dependencies automatically.
 ## How it's Made
 **Architecture & Flow**
 ```text
