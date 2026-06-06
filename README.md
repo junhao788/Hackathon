@@ -62,11 +62,50 @@ OmniLead acts as an autonomous Staff Engineer and Project Manager integrated dir
 |  [MRs]        <--- 4. Listens for MRs -> AI Tech Lead Code Review       |
 +-------------------------------------------------------------------------+
           │
-          │ (7) Assigns Tasks & Enforces 25h/Sprint Limit
+          │ (7) Assigns Tasks 
           ▼
-[ ENGINEERING TEAM (1 Junior + 1 Senior per stack) ]
+[ ENGINEERING TEAM ]
+
+
+===========================================================================
+                      AI TECH LEAD (MERGE REQUEST) FLOW
+===========================================================================
+[ DEVELOPER ]
+      │
+      │ (1) Pushes Code & Opens Merge Request
+      ▼
++-------------------------------------------------------------------------+
+|                        GITLAB WEBHOOK TRIGGER                           |
++-------------------------------------------------------------------------+
+      │ (2) Webhook Event Payload
+      ▼
++-------------------------------------------------------------------------+
+|                        OMNILEAD AGENT ENGINE                            |
+|                                                                         |
+|  [ Code Fetcher ] ---> Pulls MR Diff & Target Branch Context            |
+|          │                                                              |
+|          ▼                                                              |
+|  [ Gemini Reviewer ] ---> Analyzes:                                     |
+|                           - Security Vulnerabilities                    |
+|                           - Performance Bottlenecks                     |
+|                           - Type Safety & Best Practices                |
+|                           - Trivial Issues (e.g. leftover console.log)  |
++-------------------------------------------------------------------------+
+      │ (3) Decision Routing
+      ▼
+    /   \
+   /     \
+[PASS]  [FAIL]
+  │        │
+  │        ├─► (Minor Issue) ───► [ AUTO-REMEDIATE ]
+  │        │                        Agent pushes fix commit directly to MR
+  │        │
+  ▼        └─► (Major Issue) ───► [ BLOCK & COMMENT ]
+[ AUTO-MERGE ]                      Agent comments on MR with feedback
+  Closes Issue
 ```
 **The Stack**
+
 The system relies on deterministic rules alongside LLM intelligence to prevent hallucinated project management.
 - **Agent Engine & Backend:** Python, FastAPI, and Google Agent Development Kit (ADK).
 - **Intelligence:** Google Gemini (3.1 Flash-Lite & 2.5 Flash) leveraging the Model Context Protocol (MCP).
