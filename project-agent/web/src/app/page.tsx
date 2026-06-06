@@ -667,9 +667,9 @@ export default function Dashboard() {
         fetchSprintHistory();
       }, 5000);
     }
-    
-    // Team Workload: NO auto-fetch, NO interval.
-    // User must click "Sync Team Data" manually to avoid OOM crashes on Render free tier.
+    if (activeTab === 'team' && selectedProjectId) {
+      fetchTeamWorkload();
+    }
     
     return () => {
       if (sprintIntervalId) clearInterval(sprintIntervalId);

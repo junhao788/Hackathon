@@ -135,7 +135,7 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
    - Call list_project_issues(state='opened'), list_merge_requests(state='opened')
    - Call get_project_members(project_id) to count the number of developers on the team. CRITICAL: Do NOT count 'howwerd0898' (Werd How), anyone with `"assignable": false`, or Product Managers. Only count actual developers.
    - Draft a sprint plan prioritizing issues.
-   - SPRINT CAPACITY RULE: Each developer gets 25 hours per 7-day sprint. Calculate total sprint capacity as: (number of developers) × 25 hours. The combined total estimated_hours of ALL cards in P0 CRITICAL + P1 HIGH PRIORITY columns MUST NOT exceed this total capacity. If adding a card would exceed the capacity, move it to BACKLOG instead.
+   - SPRINT CAPACITY RULE: Each developer gets a STRICT MAXIMUM of 25 hours per sprint. You MUST track hours per person. If assigning a card to a developer would push their individual total over 25 hours, you MUST move that card to BACKLOG or assign it to someone else. The combined total estimated_hours of ALL cards in P0 CRITICAL + P1 HIGH PRIORITY columns MUST NOT exceed the team's total capacity.
    - UTILIZATION RULE: You MUST try to maximize sprint utilization. Try to assign enough tasks so that each developer is as close to their 25-hour limit as possible (a margin of +/- 3 hours is perfectly fine). Do not leave developers with only 10-15 hours of work if there are still tasks in the backlog that they have the skills to complete!
    - DEPENDENCY RULE: You MUST ensure logical sequencing of tasks. Do not pull a dependent task (e.g., "Frontend: Category management page") into P0 or P1 if its foundational dependency (e.g., "Backend: Auth API system" or "Frontend: Dashboard page") is not completed or is left in the BACKLOG. Foundational architecture and blocking tasks MUST be prioritized first.
    - CRITICAL: You MUST place ALL REMAINING open issues that were not selected for P0 or P1 into the "BACKLOG" column! Do NOT drop or ignore any open issues. Every single open issue must appear in the JSON output.
@@ -224,9 +224,10 @@ CRITICAL MCP BUG WORKAROUND: When calling ANY GitLab MCP tool, the `project_id` 
     - Analyze the project idea to determine what skills are needed (e.g., React, Python, DevOps).
     - Select engineers to invite according to these STRICT TEAM COMPOSITION RULES:
       1. A project can have at most 5 people including the project owner/lead (Werd How / howwerd0898).
-      2. The selected team must consist of: at most 1 Junior Frontend developer paired with at most 1 Mid/Senior Frontend developer, and at most 1 Junior Backend developer paired with at most 1 Mid/Senior Backend developer.
-      3. Do NOT distribute roles equally or randomly to everyone in the company. Check their experience_level, role, availability, and current workload. Prefer developers with "High" or "Medium" availability who are not already overloaded.
-      4. Only select engineers who match the required stack (e.g., frontend developers for frontend tasks, backend developers for backend tasks).
+      2. The selected team must consist of: EXACTLY 1 Junior Frontend developer paired with EXACTLY 1 Mid OR Senior Frontend developer, and EXACTLY 1 Junior Backend developer paired with EXACTLY 1 Mid OR Senior Backend developer. (No more than 2 frontends and 2 backends).
+      3. CRITICAL AVOIDANCE RULE: You MUST NOT invite engineers who are currently involved in another project or are already fully loaded. You must explicitly check their 'current_open_issues'. If it is high, or if they are assigned to another project, DO NOT invite them!
+      4. Do NOT distribute roles equally or randomly. Choose the specific junior and senior pair that best matches the stack and is available.
+      5. Only select engineers who match the required stack (e.g., frontend developers for frontend tasks, backend developers for backend tasks).
     - For EACH selected engineer, call `add_project_member(project_id=NEW_PROJECT_ID, user_id=their_gitlab_user_id, access_level=30, username=their_username)` to invite them. Note: you must pass BOTH `user_id` and `username` so mock users without a valid `user_id` can still be registered in the project memberships.
 
    STEP 2.5 - PRODUCT BLUEPRINT (Think Before You Build):

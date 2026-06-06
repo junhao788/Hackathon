@@ -712,9 +712,13 @@ def get_company_directory() -> dict:
         if user_resp.status_code == 200 and user_resp.json():
             gitlab_user_id = user_resp.json()[0].get("id")
         
+        # Dynamically fetch real workload
+        current_workload = get_global_user_open_issue_count(username)
+
         enriched_team.append({
             **p,
-            "gitlab_user_id": gitlab_user_id
+            "gitlab_user_id": gitlab_user_id,
+            "current_open_issues": current_workload
         })
     
     return {"directory": enriched_team, "total": len(enriched_team)}
