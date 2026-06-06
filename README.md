@@ -21,20 +21,50 @@ OmniLead acts as an autonomous Staff Engineer and Project Manager integrated dir
 ## How it's Made
 **Architecture & Flow**
 ```text
-You → [Project Idea] → OmniLead (Launchpad)
-                               ↓
-                      Creates Repo & Scaffolds Code
-                               ↓
-            Analyzes Global Workloads & Invites Available Devs
-                               ↓
-              Generates Blueprint & Dispatches GitLab Issues
-                               ↓
-Developers → [Push Code & Open MR] → OmniLead (AI Tech Lead)
-                               ↓
-                Code Review (Security, Types, Performance)
-                               ↓
-                 [Pass] → Auto-Merge & Close Issue
-                 [Minor Fail] → Auto-Remediate (Push Fix Commit)
+===========================================================================
+                          OMNILEAD ARCHITECTURE
+===========================================================================
+[ USER / PRODUCT OWNER ]
+          │
+          │ (1) Inputs Raw Project Idea
+          ▼
++-------------------------------------------------------------------------+
+|                        FRONTEND DASHBOARD                               |
+|                         (Next.js + React)                               |
++-------------------------------------------------------------------------+
+          │ (2) Triggers "Launchpad"
+          ▼
++-------------------------------------------------------------------------+
+|                        AGENT ENGINE (Backend)                           |
+|                         (Python + FastAPI)                              |
+|                                                                         |
+|   +-------------------+    (3) Prompts    +-------------------------+   |
+|   |   Orchestrator    | ----------------> |     LLM Intelligence    |   |
+|   | (Google ADK Core) | <---------------- | (Gemini 2.5 Flash for   |   |
+|   +-------------------+    (4) Decisions  |  deep reasoning / Arch) |   |
+|           │                               +-------------------------+   |
+|           │ (5) Tool Calls                                              |
+|           ▼                                                             |
+|   +-------------------+                                                 |
+|   |   Model Context   | ---> [ Scaffolds Codebase Locally ]             |
+|   |   Protocol (MCP)  | ---> [ Plans Architecture Blueprint ]           |
+|   +-------------------+                                                 |
++-------------------------------------------------------------------------+
+          │
+          │ (6) GitLab API & Webhooks
+          ▼
++-------------------------------------------------------------------------+
+|                          GITLAB ECOSYSTEM                               |
+|                                                                         |
+|  [Repository] <--- 1. Creates Repo & Pushes Scaffolding                 |
+|  [Issues]     <--- 2. Translates Blueprint -> Prioritized Backlog       |
+|  [Members]    <--- 3. Fetches Workloads -> Auto-Assigns Team            |
+|  [MRs]        <--- 4. Listens for MRs -> AI Tech Lead Code Review       |
++-------------------------------------------------------------------------+
+          │
+          │ (7) Assigns Tasks & Enforces 25h/Sprint Limit
+          ▼
+[ ENGINEERING TEAM (1 Junior + 1 Senior per stack) ]
 ```
 **The Stack**
 The system relies on deterministic rules alongside LLM intelligence to prevent hallucinated project management.
