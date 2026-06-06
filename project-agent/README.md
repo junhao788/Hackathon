@@ -21,9 +21,9 @@ OmniLead acts as an autonomous Staff Engineer and Project Manager integrated dir
 
 **Core Capabilities:**
 - 🚀 **Launchpad (Zero-to-One):** Give OmniLead a raw project idea, and it executes a complete bootstrap. It creates the repository, scaffolds the tech stack, designs a 3-layer architectural blueprint (Pages, APIs, DB), and batches it into prioritized GitLab issues.
-- 👥 **Smart Talent Acquisition:** OmniLead dynamically analyzes global workloads across all projects and invites the perfect mix of developers (e.g., 1 Junior + 1 Senior per stack), strictly avoiding overloaded engineers.
+- 👥 **Smart Talent Acquisition:** OmniLead dynamically analyzes global workloads across all projects and invites the perfect mix of developers, strictly avoiding overloaded engineers.
 - 🧠 **AI Tech Lead:** OmniLead acts as an autonomous gatekeeper for your main branch. It reviews Merge Requests for security, performance, and types. It auto-merges pristine code and auto-remediates minor issues (pushing fix commits automatically).
-- ⏱️ **Autonomous Sprint Planner:** It organizes issues into active Sprints with strict capacity enforcement (max 25 hours/dev) and prioritizes foundational backend dependencies automatically.
+- ⏱️ **Autonomous Sprint Planner:** It organizes issues into active Sprints with strict capacity enforcement and prioritizes foundational backend dependencies automatically.
 
 ## How it's Made
 
@@ -72,9 +72,9 @@ OmniLead acts as an autonomous Staff Engineer and Project Manager integrated dir
 |  [MRs]        <--- 4. Listens for MRs -> AI Tech Lead Code Review       |
 +-------------------------------------------------------------------------+
           │
-          │ (7) Assigns Tasks & Enforces 25h/Sprint Limit
+          │ (7) Assigns Tasks
           ▼
-[ ENGINEERING TEAM (1 Junior + 1 Senior per stack) ]
+[ ENGINEERING TEAM ]
 
 ===========================================================================
                       AI TECH LEAD (MERGE REQUEST) FLOW
@@ -122,5 +122,4 @@ The system relies on deterministic rules alongside LLM intelligence to prevent h
 - **Frontend Dashboard:** Next.js, React, and Tailwind CSS.
 - **Integrations:** GitLab REST API and Webhooks.
 
-**Resource Efficiency**
-To run on constrained environments (like Render's 512MB free tier), OmniLead bypasses heavy LLM inference for pure data aggregation. Dashboards like "Team Workload" use high-speed Python routines to fetch real-time GitLab data without memory bloat.
+
