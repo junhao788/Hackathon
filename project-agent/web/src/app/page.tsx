@@ -1420,8 +1420,8 @@ export default function Dashboard() {
 
           {/* EMPTY STATE FOR PROJECT-DEPENDENT TABS */}
           {!loadingProjects && projects.length === 0 && ['dashboard', 'standup', 'issues', 'sprint', 'architect', 'techlead', 'releases', 'team'].includes(activeTab) && (
-            <div className="flex flex-col items-center justify-center h-[70vh] animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="bg-[#18181b] border border-white/5 rounded-3xl p-10 max-w-lg text-center shadow-xl relative overflow-hidden">
+            <div className="flex flex-col items-center justify-center min-h-[70vh] py-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="bg-[#18181b] border border-white/5 rounded-3xl p-10 max-w-lg w-full text-center shadow-xl relative overflow-hidden flex-shrink-0">
                 
                 <div className="w-20 h-20 mx-auto mb-6 bg-[#0c0c0e]/60 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/5 shadow-sm">
                   <FolderGit2 className="w-10 h-10 text-text-secondary" />
