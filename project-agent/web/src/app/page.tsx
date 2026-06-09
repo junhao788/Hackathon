@@ -573,6 +573,16 @@ export default function Dashboard() {
   const [zeroRawText, setZeroRawText] = useState<string | null>(null);
   const [loadingZero, setLoadingZero] = useState(false);
   const [zeroProgress, setZeroProgress] = useState<string[]>([]);
+  const zeroAbortControllerRef = useRef<AbortController | null>(null);
+
+  const abortZeroToOne = () => {
+    if (zeroAbortControllerRef.current) {
+      zeroAbortControllerRef.current.abort();
+      zeroAbortControllerRef.current = null;
+    }
+    setLoadingZero(false);
+    setZeroProgress(p => [...p, '🛑 AI Emergency Abort Triggered.']);
+  };
 
   // State for Team Dashboard Tab
   const [teamResult, setTeamResult] = useState<any>(null);
@@ -894,7 +904,7 @@ export default function Dashboard() {
     { id: 'dashboard', icon: LayoutGrid, title: 'Dashboard' },
     { id: 'roster', icon: UserPlus, title: 'Company Roster' },
     { id: 'team', icon: Users, title: 'Team Workload' },
-    { id: 'zerotoone', icon: Rocket, title: 'Zero-to-One' },
+    { id: 'zerotoone', icon: Rocket, title: 'Launchpad' },
     { id: 'architect', icon: Zap, title: 'Auto-Architect' },
     { id: 'techlead', icon: Code, title: 'AI Tech Lead' },
     { id: 'standup', icon: CalendarDays, title: 'Standup Generator' },
@@ -1094,7 +1104,7 @@ export default function Dashboard() {
     setLoadingZero(true);
     setZeroResult(null);
     setZeroRawText(null);
-    setZeroProgress(['⏳ Initiating ZERO-TO-ONE protocol...', '🔄 Agent is creating repository...']);
+    setZeroProgress(['⏳ Initiating LAUNCHPAD protocol...', '🔄 Agent is creating repository...']);
     
     // Simulate progress updates
     const progressTimer1 = setTimeout(() => setZeroProgress(p => [...p, '📦 Scaffolding project framework...']), 6000);
@@ -1104,6 +1114,7 @@ export default function Dashboard() {
     
     try {
       const controller = new AbortController();
+      zeroAbortControllerRef.current = controller;
       const timeoutId = setTimeout(() => controller.abort(), 300000); // 300s max wait
       
       const res = await fetch('https://hackathon-030e.onrender.com/api/chat', {
@@ -1178,10 +1189,10 @@ export default function Dashboard() {
                 body: JSON.stringify({ sprint_data: pureJson })
               });
               
-              setZeroProgress(p => [...p, '✅ Zero-to-One & Sprint Planning Complete!']);
+              setZeroProgress(p => [...p, '✅ Launchpad & Sprint Planning Complete!']);
             } catch (sprintErr) {
-              console.error("Sprint planner failed during Zero-to-One", sprintErr);
-              setZeroProgress(p => [...p, '⚠️ Sprint Planner failed, but Zero-to-One completed.']);
+              console.error("Sprint planner failed during Launchpad", sprintErr);
+              setZeroProgress(p => [...p, '⚠️ Sprint Planner failed, but Launchpad completed.']);
             }
             // ---------------------------------------------------------
             
@@ -1195,9 +1206,14 @@ export default function Dashboard() {
         setZeroRawText(jsonText);
       }
       setZeroIdea('');
-    } catch (e) {
-      setZeroRawText('Error connecting to Agent.');
+    } catch (e: any) {
+      if (e.name === 'AbortError') {
+        setZeroRawText('Agent process aborted by user.');
+      } else {
+        setZeroRawText('Error connecting to Agent.');
+      }
     }
+    zeroAbortControllerRef.current = null;
     clearTimeout(progressTimer1);
     clearTimeout(progressTimer2);
     clearTimeout(progressTimer3);
@@ -1253,7 +1269,7 @@ export default function Dashboard() {
             <p className="text-[9px] font-bold text-text-tertiary uppercase tracking-[0.15em] px-2 mb-2">AI Agents</p>
             <div className="space-y-0.5">
               {[
-                { id: 'zerotoone', icon: Rocket, label: 'Zero-to-One' },
+                { id: 'zerotoone', icon: Rocket, label: 'Launchpad' },
                 { id: 'architect', icon: Zap, label: 'Auto-Architect' },
                 { id: 'techlead', icon: Code, label: 'Tech Lead' },
               ].map(item => (
@@ -1413,7 +1429,7 @@ export default function Dashboard() {
                 
                 <h2 className="text-2xl font-bold text-text-primary mb-3">No Active Projects</h2>
                 <p className="text-text-secondary text-sm mb-8 leading-relaxed">
-                  Your workspace is clean. It's time to build something new. Use the Agent's Zero-to-One capability to transform an idea into a fully scaffolded GitLab repository, complete with assigned issues and a team.
+                  Your workspace is clean. It's time to build something new. Use the Agent's Launchpad capability to transform an idea into a fully scaffolded GitLab repository, complete with assigned issues and a team.
                 </p>
                 
                 <div className="flex flex-col gap-3">
@@ -1422,7 +1438,7 @@ export default function Dashboard() {
                     className="w-full py-3.5 bg-accent text-background font-bold rounded-xl hover:bg-accent-hover transition-all flex items-center justify-center gap-2 shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:-translate-y-0.5"
                   >
                     <Rocket className="w-5 h-5" />
-                    Launch Zero-to-One
+                    Go to Launchpad
                   </button>
                   <button 
                     onClick={() => setActiveTab('roster')}
@@ -1978,13 +1994,13 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* TAB: ZERO-TO-ONE */}
+          {/* TAB: LAUNCHPAD */}
           {activeTab === 'zerotoone' && (
             <div className="bg-[#0c0c0e]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] min-h-[500px] flex flex-col">
                <div className="mb-6">
                  <div className="flex items-center gap-3 mb-2">
                    <Rocket className="w-6 h-6 text-indigo-400" />
-                   <h2 className="text-xl font-semibold text-text-primary">Zero-to-One</h2>
+                   <h2 className="text-xl font-semibold text-text-primary">Launchpad</h2>
                    <span className="text-[10px] uppercase font-bold tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">Full Lifecycle</span>
                  </div>
                  <p className="text-sm text-text-secondary mb-4">Describe a project idea. The Agent will autonomously <strong>create a repository</strong>, <strong>plan the backlog</strong>, <strong>write starter code</strong>, and <strong>open a Merge Request</strong> — all in one shot.</p>
@@ -1993,11 +2009,20 @@ export default function Dashboard() {
                    <textarea 
                      value={zeroIdea}
                      onChange={(e) => setZeroIdea(e.target.value)}
+                     disabled={loadingZero}
                      placeholder="e.g. Build a real-time chat app with WebSocket support..."
-                     className="w-full bg-transparent border border-white/5 rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-indigo-400 text-sm resize-y min-h-[120px]"
+                     className={`w-full bg-transparent border border-white/5 rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-indigo-400 text-sm resize-y min-h-[120px] ${loadingZero ? 'opacity-50 cursor-not-allowed' : ''}`}
                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleZeroToOne(); } }}
                    />
-                   <div className="flex justify-end">
+                   <div className="flex justify-end gap-3 mt-3">
+                     {loadingZero && (
+                       <button 
+                         onClick={abortZeroToOne}
+                         className="px-6 py-3 bg-red-500/20 text-red-400 border border-red-500/50 hover:bg-red-500/30 font-semibold rounded-lg transition-colors flex items-center gap-2"
+                       >
+                         <AlertCircle className="w-4 h-4" /> Emergency Abort AI
+                       </button>
+                     )}
                      <button 
                        onClick={handleZeroToOne}
                        disabled={loadingZero}
@@ -2028,7 +2053,7 @@ export default function Dashboard() {
                      <div className="bg-accent/10 border border-accent/30 rounded-xl p-4 flex items-center gap-4">
                        <CheckCheck className="w-8 h-8 text-accent shrink-0" />
                        <div>
-                         <h3 className="text-lg font-bold text-accent">ZERO-TO-ONE PROTOCOL COMPLETE</h3>
+                         <h3 className="text-lg font-bold text-accent">LAUNCHPAD PROTOCOL COMPLETE</h3>
                          <p className="text-sm text-text-secondary">All {zeroResult.steps_completed?.length || 6} automation steps executed successfully.</p>
                        </div>
                      </div>
