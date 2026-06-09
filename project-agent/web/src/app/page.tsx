@@ -1234,7 +1234,7 @@ export default function Dashboard() {
               <BrainCircuit className="w-4.5 h-4.5 text-background" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-text-primary leading-none">Project Agent</h2>
+              <h2 className="text-sm font-bold text-text-primary leading-none">OmniLead</h2>
               <p className="text-[10px] text-text-tertiary mt-0.5">AI Command Center</p>
             </div>
           </div>
@@ -1329,7 +1329,7 @@ export default function Dashboard() {
               <span className="bg-accent/10 p-2 rounded-xl border border-accent/20">
                 <Rocket className="w-6 h-6 text-accent" />
               </span>
-              Project Agent
+              OmniLead
             </h1>
             <p className="text-sm text-text-secondary mt-2 font-medium">AI-Powered GitLab Project Management & Architecture</p>
           </div>
