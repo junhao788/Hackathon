@@ -566,7 +566,7 @@ async def get_reviews(project_id: str):
     return {"reviews": data.get(project_id, [])}
 
 @app.post("/api/reviews/{project_id}/{mr_iid}/execute")
-async def execute_manual_review(project_id: str, mr_iid: int):
+def execute_manual_review(project_id: str, mr_iid: int):
     from agent.gitlab_api import get_merge_request_changes, post_mr_comment, GITLAB_API_URL, HEADERS
     from agent.agent import run_tech_lead_review
     import requests, re, time
@@ -977,7 +977,7 @@ async def execute_auto_wiki(project_id: str, mr_iid: int, target_branch: str):
         print(f"   ❌ Auto-Wiki failed: {str(e)}")
 
 
-async def auto_close_issues_on_merge(project_id: str, mr_attrs: dict):
+def auto_close_issues_on_merge(project_id: str, mr_attrs: dict):
     """Auto-close issues referenced in MR title/description when MR is merged (manual or auto)."""
     import re, requests as http_req
     from agent.gitlab_api import GITLAB_API_URL, HEADERS
@@ -1224,11 +1224,11 @@ async def gitlab_webhook_events(request: Request):
         target_branch = attrs.get("target_branch")
         
         if action in ["open", "update"]:
-            asyncio.create_task(execute_manual_review(project_id, mr_iid))
+            asyncio.create_task(asyncio.to_thread(execute_manual_review, project_id, mr_iid))
         elif action == "merge":
             asyncio.create_task(execute_auto_wiki(project_id, mr_iid, target_branch))
             # Auto-close issues referenced in MR title/description on manual merge
-            asyncio.create_task(auto_close_issues_on_merge(project_id, attrs))
+            asyncio.create_task(asyncio.to_thread(auto_close_issues_on_merge, project_id, attrs))
             
     elif event_type == "Issue Hook":
         attrs = payload.get("object_attributes", {})
